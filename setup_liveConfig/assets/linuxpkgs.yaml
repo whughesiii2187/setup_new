@@ -1,0 +1,21 @@
+pacpkg:
+  - azure-cli
+  - fastfetch
+  - gdu
+  - libreoffice-fresh
+  - neovim
+  - spotify-player
+  - ttf-0xproto-nerd
+  - vim
+  - vlc
+  - ly
+  - thunar
+  - ttf-fira-code
+  - ttf-fira-sans
+  - ttf-firacode-nerd
+  - otf-font-awesome
+aurpkg:
+  - devpod-bin
+  - powershell-bin
+  - tree-sitter-cli
+  - fd
