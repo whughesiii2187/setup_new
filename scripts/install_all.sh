@@ -4,13 +4,6 @@
 ./install_omarchy.sh
 
 ## Install pakcages I use ##
-if ! yay -Qi "zen-browser-bin" &>/dev/null; then
-  echo "Zen Browser not installed, installing now..."
-   ./install_zen.sh
-else
-  echo "Zen Browser already installed, skipping"
-fi
-
 if ! yay -Qi "kitty" &>/dev/null; then
   echo "Kitty terminal not installed, installing now"
   ./install_kitty.sh
@@ -58,6 +51,14 @@ if [ -d ~/.dotfiles/.config ]; then
   echo "Dotfiles appear to be installed already, skipping"
 else
   ./install_dotfiles.sh
+fi
+
+## Install Zen Browser ##
+if ! yay -Qi "zen-browser-bin" &>/dev/null; then
+  echo "Zen Browser not installed, installing now..."
+   ./install_zen.sh
+else
+  echo "Zen Browser already installed, skipping"
 fi
 
 ## Setup VPN ##
