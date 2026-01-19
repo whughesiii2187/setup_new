@@ -34,27 +34,6 @@ vim.keymap.set('v', '<leader>/', 'gc', { remap = true, desc = 'Toggle comment bl
 
 -- Leader mappings ============================================================
 
--- Neovim has the concept of a Leader key (see `:h <Leader>`). It is a configurable
--- key that is primarily used for "workflow" mappings (opposed to text editing).
--- Like "open file explorer", "create scratch buffer", "pick from buffers".
---
--- In 'plugin/10_options.lua' <Leader> is set to <Space>, i.e. press <Space>
--- whenever there is a suggestion to press <Leader>.
---
--- This config uses a "two key Leader mappings" approach: first key describes
--- semantic group, second key executes an action. Both keys are usually chosen
--- to create some kind of mnemonic.
--- Example: `<Leader>f` groups "find" type of actions; `<Leader>ff` - find files.
--- Use this section to add Leader mappings in a structural manner.
---
--- Usually if there are global and local kinds of actions, lowercase second key
--- denotes global and uppercase - local.
--- Example: `<Leader>fs` / `<Leader>fS` - find workspace/document LSP symbols.
---
--- Many of the mappings use 'mini.nvim' modules set up in 'plugin/30_mini.lua'.
-
--- Create a global table with information about Leader groups in certain modes.
--- This is used to provide 'mini.clue' with extra clues.
 -- Add an entry if you create a new group.
 _G.Config.leader_group_clues = {
   { mode = 'n', keys = '<Leader>b', desc = '+Buffer' },
@@ -72,10 +51,6 @@ _G.Config.leader_group_clues = {
 }
 
 -- Helpers for a more concise `<Leader>` mappings.
--- Most of the mappings use `<Cmd>...<CR>` string as a right hand side (RHS) in
--- an attempt to be more concise yet descriptive. See `:h <Cmd>`.
--- This approach also doesn't require the underlying commands/functions to exist
--- during mapping creation: a "lazy loading" approach to improve startup time.
 local nmap_leader = function(suffix, rhs, desc)
   vim.keymap.set('n', '<Leader>' .. suffix, rhs, { desc = desc })
 end
@@ -84,9 +59,6 @@ local xmap_leader = function(suffix, rhs, desc)
 end
 
 -- b is for 'Buffer'. Common usage:
--- - `<Leader>bs` - create scratch (temporary) buffer
--- - `<Leader>ba` - navigate to the alternative buffer
--- - `<Leader>bw` - wipeout (fully delete) current buffer
 local new_scratch_buffer = function()
   vim.api.nvim_win_set_buf(0, vim.api.nvim_create_buf(true, true))
 end
