@@ -48,7 +48,7 @@ fi
 
 if ! yay -Qi "tmux" &>/dev/null; then
   echo "TMUX not installed, installing now..."
-  ./install_podman.sh
+  ./install_tmux.sh
 else
   echo "TMUX already installed, skipping"
 fi

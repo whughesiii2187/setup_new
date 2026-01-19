@@ -1,13 +1,6 @@
 #!/bin/sh
 
-## Install theme ##
-if ! omarchy-theme-list | grep "Neovoid" &>/dev/null; then
-  echo "Installing Neovoid theme"
-  ./install_neovoid.sh
-else
-  echo "Neovoid theme already installed, skipping"
-fi
-
+## Replace iwd and Impala ##
 if ! yay -Qi "gazelle-tui" &>/dev/null; then
   echo "Gazelle-tui not installed, installing now..."
   ./install_gazelle.sh

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-yay -S --noconfirm --needed gazelle-tui networkmamager wpa_supplicant nm-connection-editor wireguard-tools
+yay -S --noconfirm --needed gazelle-tui networkmanager wpa_supplicant nm-connection-editor wireguard-tools
 
 ## Convert from systemd-network and iwd to NetworkManager and wpa_supplicant
 sudo systemctl stop iwd systemd-networkd
