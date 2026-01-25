@@ -11,6 +11,14 @@ fi
 ## Install Optimus Boot Theme ##
 ./install_optimus.sh
 
+## Install hyprdynamicmonitors
+if ! yay -Qi "hyprdynamicmonitors-bin" &>/dev/null; then
+  echo "hyprdynamicmonitors not installed, installing now..."
+  ./install_gazelle.sh
+else
+  echo "hyprdynamicmonitors already installed"
+fi
+
 ## Omarchy overrides ##
 #check that file doesn't exist and that entry to hyprland.conf doesn't exist
 cp ../omarchy/omarchy_overrides.conf ~/.config/hypr/
