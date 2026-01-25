@@ -1,8 +1,5 @@
 #!/bin/sh
 
-# Take care of some new Omarchy install prereqs
-./install_omarchy.sh
-
 ## Install pakcages I use ##
 if ! yay -Qi "kitty" &>/dev/null; then
   echo "Kitty terminal not installed, installing now"
@@ -60,6 +57,9 @@ if ! yay -Qi "zen-browser-bin" &>/dev/null; then
 else
   echo "Zen Browser already installed, skipping"
 fi
+
+# Take care of some new Omarchy install prereqs
+./install_omarchy.sh
 
 ## Setup VPN ##
 ./install_vpn.sh
