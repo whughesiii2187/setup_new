@@ -9,7 +9,7 @@ echo "START KVM/QEMU/VIRT MANAGER INSTALLATION..."
 # ------------------------------------------------------
 # Install Packages
 # ------------------------------------------------------
-sudo pacman -S virt-manager virt-viewer qemu vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf swtpm vim
+yay -S virt-manager virt-viewer qemu vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf swtpm vim
 
 # ------------------------------------------------------
 # Edit libvirtd.conf
