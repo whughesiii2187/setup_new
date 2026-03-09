@@ -1,12 +1,12 @@
 #!/bin/sh
 
 ## Install pakcages I use ##
-if ! yay -Qi "kitty" &>/dev/null; then
-  echo "Kitty terminal not installed, installing now"
-  ./install_kitty.sh
-else
-  echo "Kitty terminal already installed, skipping"
-fi
+# if ! yay -Qi "kitty" &>/dev/null; then
+#   echo "Kitty terminal not installed, installing now"
+#   ./install_kitty.sh
+# else
+#   echo "Kitty terminal already installed, skipping"
+# fi
 
 # if ! yay -Qi "bitwarden" &>/dev/null; then
 #   echo "Bitwarden not installed, installing now..."
@@ -29,12 +29,12 @@ else
   echo "ZSH already installed, skipping"
 fi
 
-# if ! yay -Qi "podman" &>/dev/null; then
-#   echo "Podman and tools not installed, installing now..."
-#   ./install_podman.sh
-# else
-#   echo "Podman already installed, skipping"
-# fi
+if ! yay -Qi "podman" &>/dev/null; then
+  echo "Podman and tools not installed, installing now..."
+  ./install_podman.sh
+else
+  echo "Podman already installed, skipping"
+fi
 
 if ! yay -Qi "tmux" &>/dev/null; then
   echo "TMUX not installed, installing now..."
@@ -44,12 +44,12 @@ else
 fi
 
 ## Install Zen Browser ##
-if ! yay -Qi "zen-browser-bin" &>/dev/null; then
-  echo "Zen Browser not installed, installing now..."
-   ./install_zen.sh
-else
-  echo "Zen Browser already installed, skipping"
-fi
+# if ! yay -Qi "zen-browser-bin" &>/dev/null; then
+#   echo "Zen Browser not installed, installing now..."
+#    ./install_zen.sh
+# else
+#   echo "Zen Browser already installed, skipping"
+# fi
 
 # Take care of some new Omarchy install prereqs
 ./install_omarchy.sh
@@ -62,4 +62,4 @@ else
 fi
 
 ## Setup VPN ##
-# ./install_vpn.sh
+./install_vpn.sh
