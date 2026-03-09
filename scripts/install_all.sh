@@ -1,19 +1,19 @@
 #!/bin/sh
 
 ## Install pakcages I use ##
-# if ! yay -Qi "kitty" &>/dev/null; then
-#   echo "Kitty terminal not installed, installing now"
-#   ./install_kitty.sh
-# else
-#   echo "Kitty terminal already installed, skipping"
-# fi
+if ! yay -Qi "ghostty" &>/dev/null; then
+  echo "Ghostty terminal not installed, installing now"
+  ./install_ghostty.sh
+else
+  echo "Ghostty terminal already installed, skipping"
+fi
 
-# if ! yay -Qi "bitwarden" &>/dev/null; then
-#   echo "Bitwarden not installed, installing now..."
-#   ./install_bitwarden.sh
-# else
-#   echo "Bitwarden alraedy installed,"
-# fi
+if ! yay -Qi "bitwarden" &>/dev/null; then
+  echo "Bitwarden not installed, installing now..."
+  ./install_bitwarden.sh
+else
+  echo "Bitwarden alraedy installed,"
+fi
 
 if ! yay -Qi "stow" &>/dev/null; then
   echo "Stow not installed, installing now..."
@@ -43,14 +43,6 @@ else
   echo "TMUX already installed, skipping"
 fi
 
-## Install Zen Browser ##
-# if ! yay -Qi "zen-browser-bin" &>/dev/null; then
-#   echo "Zen Browser not installed, installing now..."
-#    ./install_zen.sh
-# else
-#   echo "Zen Browser already installed, skipping"
-# fi
-
 # Take care of some new Omarchy install prereqs
 ./install_omarchy.sh
 
@@ -62,4 +54,4 @@ else
 fi
 
 ## Setup VPN ##
-./install_vpn.sh
+# ./install_vpn.sh
