@@ -30,3 +30,6 @@ cp ../omarchy/omarchy-fix-hyprlock ~/.local/share/omarchy/bin/
 # Check that ~/.dotfiles doesn't exist first
 rm -rf ~/.config/kitty/ ~/.config/nvim/ ~/.local/state/nvim/ ~/.local/share/nvim/
 
+#Install Themes
+omarchy-theme-install https://github.com/HANCORE-linux/omarchy-sapphire-theme.git
+omarchy-theme-install https://github.com/JJDizz1L/aetheria.git
