@@ -54,4 +54,4 @@ else
 fi
 
 ## Setup VPN ##
-# ./install_vpn.sh
+./install_vpn.sh

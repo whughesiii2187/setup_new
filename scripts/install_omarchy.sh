@@ -1,13 +1,5 @@
 #!/bin/sh
 
-## Replace iwd and Impala ##
-if ! yay -Qi "gazelle-tui" &>/dev/null; then
-  echo "Gazelle-tui not installed, installing now..."
-  ./install_gazelle.sh
-else
-  echo "Gazelle-tui already installed"
-fi
-
 ## Install hyprdynamicmonitors
 # if ! yay -Qi "hyprdynamicmonitors-bin" &>/dev/null; then
 #   echo "hyprdynamicmonitors not installed, installing now..."
@@ -25,6 +17,9 @@ echo "source = ~/.config/hypr/omarchy_overrides.conf" >> ~/.config/hypr/hyprland
 # check that file doesn't exist first
 cp ../omarchy/omarchy-toggle-vpn ~/.local/share/omarchy/bin/
 cp ../omarchy/omarchy-fix-hyprlock ~/.local/share/omarchy/bin/
+
+## Screensaver text I hate that ugly Omarcy one ###
+cp ../omarchy/screensaver.txt ~/.config/omarchy/branding/
 
 ## Dotfiles
 # Check that ~/.dotfiles doesn't exist first

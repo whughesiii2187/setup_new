@@ -10,10 +10,8 @@ plugins=(
 
 
 # User configuration
-
+ZSH_THEME="bureau"
 source $ZSH/oh-my-zsh.sh
-
-eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/default.omp.json)"
 
 alias vi="nvim"
 alias v="nvim"

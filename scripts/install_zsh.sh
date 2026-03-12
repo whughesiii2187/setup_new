@@ -1,5 +1,5 @@
 #!/bin/sh
 
-yay -S --noconfirm --needed zsh oh-my-posh
+yay -S --noconfirm --needed zsh
 
 chsh -s $(which zsh)
