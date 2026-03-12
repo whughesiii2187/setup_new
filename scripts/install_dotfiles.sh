@@ -2,5 +2,5 @@
 
 mkdir ~/.dotfiles
 cp -r ../dotfiles/.* ~/.dotfiles/
-cd ~/.dotfiles
-stow .
+# cd ~/.dotfiles
+# stow .

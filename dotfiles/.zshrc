@@ -6,6 +6,9 @@ plugins=(
   git
   kubectl
   helm
+  docker
+  docker-compose
+  podman
 )
 
 
