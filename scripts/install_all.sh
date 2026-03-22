@@ -70,6 +70,9 @@ else
   ./install_dotfiles.sh
 fi
 
+# Allow CUPS through firewall
+sudo ufw allow 631/tcp
+
 # Install better wifi tui
 if ! yay -Qi "gazelle-tui" &>/dev/null; then
   echo "Gazelle-tui not installed, installing now"
