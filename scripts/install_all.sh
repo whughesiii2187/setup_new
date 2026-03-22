@@ -44,7 +44,7 @@ else
 fi
 
 # Take care of some new Omarchy install prereqs
-./install_omarchy.sh
+# ./install_omarchy.sh
 
 ## Clone and Stow Dotfiles ##
 if [ -d ~/.dotfiles/.config ]; then
@@ -52,6 +52,20 @@ if [ -d ~/.dotfiles/.config ]; then
 else
   ./install_dotfiles.sh
 fi
+
+## Omarchy overrides ##
+echo "source = ~/.config/hypr/omarchy_overrides.conf" >> ~/.config/hypr/hyprland.conf
+
+## Screensaver text I hate that ugly Omarcy one ###
+# cp ../omarchy/screensaver.txt ~/.config/omarchy/branding/
+
+## Dotfiles
+# Check that ~/.dotfiles doesn't exist first
+rm -rf ~/.config/kitty/ ~/.config/nvim/ ~/.local/state/nvim/ ~/.local/share/nvim/
+
+#Install Themes
+omarchy-theme-install https://github.com/JJDizz1L/aetheria.git
+omarchy-theme-install https://github.com/HANCORE-linux/omarchy-sapphire-theme.git
 
 ## Setup VPN ##
 ./install_vpn.sh

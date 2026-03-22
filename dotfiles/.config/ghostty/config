@@ -1,0 +1,15 @@
+# ── padding ────────────────────────────────────────────────────────────────────
+window-padding-x = 0
+window-padding-y = 0
+window-padding-balance = false
+
+# ── font ───────────────────────────────────────────────────────────────────────
+# font-family = your-font-here
+# font-size = 13
+
+# ── shell ──────────────────────────────────────────────────────────────────────
+shell-integration = detect
+
+# ── behaviour ──────────────────────────────────────────────────────────────────
+confirm-close-surface = false
+quit-after-last-window-closed = true

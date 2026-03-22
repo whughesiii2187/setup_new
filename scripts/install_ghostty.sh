@@ -1,3 +1,3 @@
 #!/bin/sh
 
-omarchy-install-terminal ghostty
+yay -S --needed --noconfirm ghostty

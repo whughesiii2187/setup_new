@@ -13,7 +13,7 @@ plugins=(
 
 
 # User configuration
-ZSH_THEME="bureau"
+ZSH_THEME="fishy"
 source $ZSH/oh-my-zsh.sh
 
 alias vi="nvim"
@@ -22,8 +22,8 @@ alias gg="lazygit"
 alias ff="fzf"
 alias getmyip="dig -4 TXT +short o-o.myaddr.l.google.com @ns1.google.com"
 alias python="python3"
-alias devc="devpod up . && devpod ssh . --command "zsh""
+alias devpod="~/scripts/dc"
 
-if [[ "$(uname)" == 'Darwin' ]]; then
-  alias acr="az login && az acr login -n r1k8sacrdev"
-fi
+export DOCKER_HOST=unix:///run/user/$(id -u)/podman/podman.sock
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
