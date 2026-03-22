@@ -43,8 +43,25 @@ else
   echo "TMUX already installed, skipping"
 fi
 
+if ! yay -Qi "hyprdynamicmonitors-bin" &>/dev/null; then
+  echo "hyprdynamicmonitors not installed, installing now..."
+  ./install_hyprdynamicmonitors.sh
+else
+  echo "hyprdynamicmonitors already installed"
+fi
+
 # Take care of some new Omarchy install prereqs
-# ./install_omarchy.sh
+
+## Omarchy overrides ##
+echo "source = ~/.config/hypr/omarchy_overrides.conf" >> ~/.config/hypr/hyprland.conf
+
+## Dotfiles
+# Check that ~/.dotfiles doesn't exist first
+rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.local/state/nvim/ ~/.local/share/nvim/ ~/.config/omarchy/branding/screensaver.txt
+
+#Install Themes
+omarchy-theme-install https://github.com/JJDizz1L/aetheria.git
+omarchy-theme-install https://github.com/HANCORE-linux/omarchy-sapphire-theme.git
 
 ## Clone and Stow Dotfiles ##
 if [ -d ~/.dotfiles/.config ]; then
@@ -53,19 +70,13 @@ else
   ./install_dotfiles.sh
 fi
 
-## Omarchy overrides ##
-echo "source = ~/.config/hypr/omarchy_overrides.conf" >> ~/.config/hypr/hyprland.conf
-
-## Screensaver text I hate that ugly Omarcy one ###
-# cp ../omarchy/screensaver.txt ~/.config/omarchy/branding/
-
-## Dotfiles
-# Check that ~/.dotfiles doesn't exist first
-rm -rf ~/.config/kitty/ ~/.config/nvim/ ~/.local/state/nvim/ ~/.local/share/nvim/
-
-#Install Themes
-omarchy-theme-install https://github.com/JJDizz1L/aetheria.git
-omarchy-theme-install https://github.com/HANCORE-linux/omarchy-sapphire-theme.git
+# Install better wifi tui
+if ! yay -Qi "gazelle-tui" &>/dev/null; then
+  echo "Gazelle-tui not installed, installing now"
+  ./install_gazelle.sh
+else
+  echo "Gazelle-tui already installed, skipping"
+fi
 
 ## Setup VPN ##
 ./install_vpn.sh
