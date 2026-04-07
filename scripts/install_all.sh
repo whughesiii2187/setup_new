@@ -8,13 +8,6 @@ else
   echo "Ghostty terminal already installed, skipping"
 fi
 
-if ! yay -Qi "zen-browser-bin" &>/dev/null; then
-  echo "Zen Browser not installed, installing now"
-  ./install_zen-browser.sh
-else
-  echo "Zen Browser already installed, skipping"
-fi
-
 if ! yay -Qi "bitwarden" &>/dev/null; then
   echo "Bitwarden not installed, installing now..."
   ./install_bitwarden.sh
