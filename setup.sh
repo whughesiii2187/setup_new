@@ -1,9 +1,5 @@
 #!/bin/sh
 
-if [ -d ~/.config/ghostty ]; then
-  rm -rf ~/.config/ghostty
-fi
-
 if [ "$(uname)" = "Darwin" ]; then
   git clone --filter=blob:none --sparse https://github.com/whughesiii2187/dotfiles ~/dotfiles
   cd ~/dotfiles/
