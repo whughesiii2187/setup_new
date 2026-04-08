@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ -d ~/.config/ghostty ]; then
+  rm -rf ~/.config/ghostty
+fi
+
 if [ "$(uname)" = "Darwin" ]; then
   git clone --filter=blob:none --sparse https://github.com/whughesiii2187/dotfiles ~/dotfiles
   cd ~/dotfiles/
@@ -21,7 +25,7 @@ elif [ $(uname) = "Linux" ]; then
   cd ~/dotfiles/
   git sparse-checkout set linux
   cd linux
-  stow -t ~ ghostty --adopt
+  stow -t ~ ghostty 
   stow -t ~ nvim
   stow -t ~ tmux
   stow -t ~ zshrc
