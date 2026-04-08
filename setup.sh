@@ -21,7 +21,7 @@ elif [ $(uname) = "Linux" ]; then
   cd ~/dotfiles/
   git sparse-checkout set linux
   cd linux
-  stow -t ~ ghostty --adpot
+  stow -t ~ ghostty --adopt
   stow -t ~ nvim
   stow -t ~ tmux
   stow -t ~ zshrc
