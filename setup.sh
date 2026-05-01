@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -d "/workspace" ]; then
+if [[ -d "/workspace" || -d ".devcontainer" ]]; then
   git clone --filter=blob:none --sparse https://github.com/whughesiii2187/dotfiles ~/dotfiles
   cd ~/dotfiles/
   git sparse-checkout set devc
