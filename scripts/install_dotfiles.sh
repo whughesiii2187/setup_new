@@ -1,6 +1,3 @@
 #!/bin/sh
 
-mkdir ~/dotfiles
-cp -r ../dotfiles/.* ~/dotfiles/
-cd ~/dotfiles
-stow . --adopt
+source ../setup.sh

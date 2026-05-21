@@ -22,13 +22,6 @@ else
   echo "Stow already installed, skipping"
 fi
 
-if ! yay -Qi "zsh" &>/dev/null; then
-  echo "ZSH not installed, installing now..."
-  ./install_zsh.sh
-else
-  echo "ZSH already installed, skipping"
-fi
-
 if ! yay -Qi "podman" &>/dev/null; then
   echo "Podman and tools not installed, installing now..."
   ./install_podman.sh
@@ -43,11 +36,11 @@ else
   echo "TMUX already installed, skipping"
 fi
 
-if ! yay -Qi "hyprdynamicmonitors-bin" &>/dev/null; then
-  echo "hyprdynamicmonitors not installed, installing now..."
-  ./install_hyprdynamicmonitors.sh
+if ! yay -Qi "brew" &>/dev/null; then
+  echo "Brew not installed, installing now..."
+  ./install_brew.sh
 else
-  echo "hyprdynamicmonitors already installed"
+  echo "Brew already installed, skipping"
 fi
 
 # Take care of some new Omarchy install prereqs
@@ -59,9 +52,12 @@ echo "source = ~/.config/hypr/omarchy_overrides.conf" >> ~/.config/hypr/hyprland
 # Check that ~/.dotfiles doesn't exist first
 rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.local/state/nvim/ ~/.local/share/nvim/ ~/.config/omarchy/branding/screensaver.txt
 
-#Install Themes
-omarchy-theme-install https://github.com/JJDizz1L/aetheria.git
-omarchy-theme-install https://github.com/HANCORE-linux/omarchy-sapphire-theme.git
+if ! yay -Qi "zsh" &>/dev/null; then
+  echo "ZSH not installed, installing now..."
+  ./install_zsh.sh
+else
+  echo "ZSH already installed, skipping"
+fi
 
 ## Clone and Stow Dotfiles ##
 if [ -d ~/.dotfiles/.config ]; then
@@ -73,13 +69,5 @@ fi
 # Allow CUPS through firewall
 sudo ufw allow 631/tcp
 
-# Install better wifi tui
-if ! yay -Qi "gazelle-tui" &>/dev/null; then
-  echo "Gazelle-tui not installed, installing now"
-  ./install_gazelle.sh
-else
-  echo "Gazelle-tui already installed, skipping"
-fi
-
-## Setup VPN ##
-./install_vpn.sh
+#debloat omarchy
+bash <(curl -fsSL https://raw.githubusercontent.com/DanielCoffey1/a-la-carchy/master/a-la-carchy.sh)

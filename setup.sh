@@ -14,14 +14,16 @@ else
   stow -t ~ ghostty 
   stow -t ~ nvim
   stow -t ~ tmux
-  stow -t ~ zshrc
   if [ -d ~/.local/share/omarchy ]; then
     stow -t ~ omarchy
   fi
+  # OS Specific
   if [ "$(uname)" = "Darwin" ]; then
     stow -t ~ aerospace
     stow -t ~ sketchybar
     stow -t ~ macoszshrc
+  else
+    stow -t ~ zshrc
   fi
 fi
 
