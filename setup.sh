@@ -8,6 +8,7 @@ if [[ -d "/workspace" || -d ".devcontainer" ]]; then
   ./setup.sh
 else
   git clone --filter=blob:none --sparse https://github.com/whughesiii2187/dotfiles ~/dotfiles
+  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
   cd ~/dotfiles/
   git sparse-checkout set default
   cd default
