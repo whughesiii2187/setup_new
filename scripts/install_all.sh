@@ -47,10 +47,11 @@ fi
 
 ## Omarchy overrides ##
 echo "source = ~/.config/hypr/omarchy_overrides.conf" >> ~/.config/hypr/hyprland.conf
+echo "source = ~/.config/hypr/omarchy_keybind_overrides.conf" >> ~/.config/hypr/hyprland.conf
 
 ## Dotfiles
 # Check that ~/.dotfiles doesn't exist first
-rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.local/state/nvim/ ~/.local/share/nvim/ ~/.config/omarchy/branding/screensaver.txt
+rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/.local/share/nvim/ ~/.config/omarchy/branding/screensaver.txt
 
 if ! yay -Qi "zsh" &>/dev/null; then
   echo "ZSH not installed, installing now..."
@@ -60,7 +61,7 @@ else
 fi
 
 ## Clone and Stow Dotfiles ##
-if [ -d ~/.dotfiles/.config ]; then
+if [ -d "$HOME/dotfiles" ]; then
   echo "Dotfiles appear to be installed already, skipping"
 else
   ./install_dotfiles.sh

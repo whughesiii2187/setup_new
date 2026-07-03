@@ -24,7 +24,9 @@ else
     stow -t ~ aerospace
     stow -t ~ sketchybar
     stow -t ~ macoszshrc
-  else
+  fi
+  if [ -f "$HOME/.zshrc" ]; then
+    rm $HOME/.zshrc
     stow -t ~ zshrc
   fi
 fi
