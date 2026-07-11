@@ -22,13 +22,6 @@ else
   echo "Stow already installed, skipping"
 fi
 
-if ! yay -Qi "podman" &>/dev/null; then
-  echo "Podman and tools not installed, installing now..."
-  ./install_podman.sh
-else
-  echo "Podman already installed, skipping"
-fi
-
 if ! yay -Qi "tmux" &>/dev/null; then
   echo "TMUX not installed, installing now..."
   ./install_tmux.sh
@@ -51,7 +44,7 @@ echo "source = ~/.config/hypr/omarchy_keybind_overrides.conf" >> ~/.config/hypr/
 
 ## Dotfiles
 # Check that ~/.dotfiles doesn't exist first
-rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/.local/share/nvim/ ~/.config/omarchy/branding/screensaver.txt
+rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/.local/share/nvim/ ~/.config/tmux
 
 if ! yay -Qi "zsh" &>/dev/null; then
   echo "ZSH not installed, installing now..."
@@ -72,3 +65,8 @@ sudo ufw allow 631/tcp
 
 #debloat omarchy
 bash <(curl -fsSL https://raw.githubusercontent.com/DanielCoffey1/a-la-carchy/master/a-la-carchy.sh)
+
+./install_printer.sh
+./install_vpn.sh
+./install_gazelle.sh
+
