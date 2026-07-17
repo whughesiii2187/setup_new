@@ -8,12 +8,7 @@ else
   echo "Ghostty terminal already installed, skipping"
 fi
 
-if ! yay -Qi "bitwarden" &>/dev/null; then
-  echo "Bitwarden not installed, installing now..."
-  ./install_bitwarden.sh
-else
-  echo "Bitwarden alraedy installed,"
-fi
+./install_bitwarden.sh
 
 if ! yay -Qi "stow" &>/dev/null; then
   echo "Stow not installed, installing now..."
