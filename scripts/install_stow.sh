@@ -5,5 +5,5 @@ if command -v yay &> /dev/null; then
 fi
 
 if command -v dnf &> /dev/null; then
-  sudo dnf install stow
+  sudo dnf install -y stow
 fi
