@@ -9,7 +9,7 @@ if command -v yay &> /dev/null; then
 fi
 
 if command -v dnf &> /dev/null; then
-  sudo dnf install snap
+  sudo dnf install -y snap
   sudo snap wait system seed.loaded
   sudo snap install bitwarden
 fi
