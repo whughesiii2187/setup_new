@@ -25,7 +25,7 @@ fi
 
 ## Dotfiles
 # Check that ~/.dotfiles doesn't exist first
-rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/.local/share/nvim/ ~/.config/tmux ~/.zshrc
+rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/.local/share/nvim/ ~/.config/tmux
 ## Clone and Stow Dotfiles ##
 if [ -d "$HOME/dotfiles" ]; then
   echo "Dotfiles appear to be installed already, skipping"
