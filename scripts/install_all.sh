@@ -10,9 +10,12 @@
 
 # Take care of some new Omarchy install prereqs
 ## Omarchy overrides ##
+HYPR_VERSION=hyprland --version-json | jq '.version'
 if [ -d "$HOME/.config/omarchy" ]; then
-  echo "source = ~/.config/hypr/omarchy_overrides.conf" >> ~/.config/hypr/hyprland.conf
-  echo "source = ~/.config/hypr/omarchy_keybind_overrides.conf" >> ~/.config/hypr/hyprland.conf
+  if [[ "$HYPR_VERSION" > "0.55.0" ]]; then
+    echo "require("omarchy_overrides")" >> ~/.config/hypr/hyprlnd.lua
+  else
+    echo "source = ~/.config/hypr/omarchy_overrides.conf" >> ~/.config/hypr/hyprland.conf
 fi
 
 # Allow CUPS through firewall
@@ -34,5 +37,3 @@ else
 fi
 
 ./install_tmux.sh
-# ./install_vpn.sh
-# ./install_gazelle.sh
