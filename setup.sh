@@ -12,7 +12,7 @@ else
   git sparse-checkout set default
   cd default
   stow -t ~ ghostty
-  stow -t ~ nvim
+  # stow -t ~ nvim
   stow -t ~ tmux
 
   if [ -f "$HOME/.zshrc" ]; then
@@ -23,7 +23,7 @@ else
     stow -t ~ omarchy
     rm -rf ~/.config/tmux
   fi
-   
+ 
   # OS Specific
   if [ "$(uname)" = "Darwin" ]; then
     stow -t ~ aerospace
