@@ -10,10 +10,10 @@
 
 # Take care of some new Omarchy install prereqs
 ## Omarchy overrides ##
-HYPR_VERSION=hyprland --version-json | jq '.version'
+HYPR_VERSION="hyprland --version-json | jq '.version'"
 if [ -d "$HOME/.config/omarchy" ]; then
   if [[ "$HYPR_VERSION" > "0.55.0" ]]; then
-    echo "require("omarchy_overrides")" >> ~/.config/hypr/hyprlnd.lua
+    echo "require(""omarchy_overrides"")" >> ~/.config/hypr/hyprland.lua
   else
     echo "source = ~/.config/hypr/omarchy_overrides.conf" >> ~/.config/hypr/hyprland.conf
 fi
