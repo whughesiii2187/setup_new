@@ -7,6 +7,7 @@
 ./install_brew.sh
 ./install_printer.sh
 ./install_zsh.sh
+./install_vpn.sh
 
 # Take care of some new Omarchy install prereqs
 ## Omarchy overrides ##
