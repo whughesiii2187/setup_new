@@ -19,10 +19,10 @@ else
     rm $HOME/.zshrc
     stow -t ~ zshrc
   fi
-  if [ -d ~/.local/share/omarchy ]; then
+  # if [ -d ~/.local/share/omarchy ]; then ## Fix this because omarchy changed shit
     stow -t ~ omarchy
     rm -rf ~/.config/tmux
-  fi
+  # fi
  
   # OS Specific
   if [ "$(uname)" = "Darwin" ]; then
