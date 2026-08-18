@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cd "$(dirname "$0")"
+
 ## Devcontainer mode: minimal setup, nothing desktop-specific ##
 if [ "$1" = "devc" ]; then
   ./install_devcontainerdots.sh
