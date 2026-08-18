@@ -2,9 +2,45 @@
 
 cd "$(dirname "$0")"
 
+## Logging: mirror everything to a timestamped file so failures (e.g. a
+## step that silently no-ops instead of erroring) are visible after the
+## fact, not just on a scrollback the user may not have kept. ##
+LOG_DIR="$(cd .. && pwd)/logs"
+mkdir -p "$LOG_DIR"
+LOG_FILE="$LOG_DIR/install-$(date +%Y%m%d-%H%M%S).log"
+exec > >(tee -a "$LOG_FILE") 2>&1
+echo "==> Logging to $LOG_FILE"
+
+FAILED_STEPS=""
+
+## Run a step, logging its start/end and recording (without aborting the
+## rest of the run) whether it failed, since individual steps have always
+## been allowed to fail without stopping the overall install. ##
+run_step() {
+  echo "==> [$(date '+%H:%M:%S')] $*"
+  "$@"
+  status=$?
+  if [ "$status" -ne 0 ]; then
+    echo "!!  [$(date '+%H:%M:%S')] FAILED (exit $status): $*"
+    FAILED_STEPS="$FAILED_STEPS
+  - $* (exit $status)"
+  fi
+  return "$status"
+}
+
+print_summary() {
+  echo "==> Log saved to $LOG_FILE"
+  if [ -n "$FAILED_STEPS" ]; then
+    echo "==> Steps that failed:$FAILED_STEPS"
+  else
+    echo "==> All steps completed successfully"
+  fi
+}
+trap print_summary EXIT
+
 ## Devcontainer mode: minimal setup, nothing desktop-specific ##
 if [ "$1" = "devc" ]; then
-  ./install_devcontainerdots.sh
+  run_step ./install_devcontainerdots.sh
   exit 0
 fi
 
@@ -20,22 +56,22 @@ if [[ "$1" == "dms" ]]; then
   DANK_BOOTSTRAP=$(mktemp)
   curl -fsSL https://install.danklinux.com -o "$DANK_BOOTSTRAP"
   sed -i 's|^\./installer$|./installer -c hyprland -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar|' "$DANK_BOOTSTRAP"
-  bash "$DANK_BOOTSTRAP"
+  run_step bash "$DANK_BOOTSTRAP"
   rm -f "$DANK_BOOTSTRAP"
 fi
 
 ## Install pakcages I use ##
 if [[ "$1" != "dms" ]]; then
-  ./install_ghostty.sh
+  run_step ./install_ghostty.sh
 fi
-./install_bitwarden.sh
-./install_stow.sh
-./install_brew.sh
-./install_printer.sh
-./install_zsh.sh
-./install_vpn.sh
-./install_tmux.sh
-./install_ufw.sh
+run_step ./install_bitwarden.sh
+run_step ./install_stow.sh
+run_step ./install_brew.sh
+run_step ./install_printer.sh
+run_step ./install_zsh.sh
+run_step ./install_vpn.sh
+run_step ./install_tmux.sh
+run_step ./install_ufw.sh
 
 ## Omarchy overrides ##
 if [[ "$1" == "omarchy" ]]; then
@@ -54,7 +90,7 @@ if [[ "$1" == "omarchy" ]]; then
   fi
 
   #debloat omarchy
-  bash <(curl -fsSL https://raw.githubusercontent.com/DanielCoffey1/a-la-carchy/master/a-la-carchy.sh)
+  run_step bash <(curl -fsSL https://raw.githubusercontent.com/DanielCoffey1/a-la-carchy/master/a-la-carchy.sh)
 fi
 
 ## Clone and Stow Dotfiles ##
@@ -64,6 +100,6 @@ else
   # Directory cleanup so stow can symlink cleanly, even if ghostty/nvim/tmux
   # were installed (and their default configs created) by steps above.
   rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/.local/share/nvim/
-  ./install_dotfiles.sh
+  run_step ./install_dotfiles.sh
 fi
 
