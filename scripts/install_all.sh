@@ -15,7 +15,16 @@ rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/
 
 ## Install Dank or skip ##
 if [[ "$1" == "dms" ]]; then
-  curl -fsSL https://install.danklinux.com | sh -s -- -c hyprland -t ghostty -y
+  # install.danklinux.com's bootstrap script doesn't forward args to the
+  # dankinstall binary it downloads (it just runs `./installer` with none),
+  # so passing flags via `sh -s --` silently gets dropped and it falls back
+  # to the interactive TUI. Work around it by patching the fetched script
+  # to pass our flags through before running it.
+  DANK_BOOTSTRAP=$(mktemp)
+  curl -fsSL https://install.danklinux.com -o "$DANK_BOOTSTRAP"
+  sed -i 's|^\./installer$|./installer -c hyprland -t ghostty -y|' "$DANK_BOOTSTRAP"
+  bash "$DANK_BOOTSTRAP"
+  rm -f "$DANK_BOOTSTRAP"
 fi
 
 ## Install pakcages I use ##
