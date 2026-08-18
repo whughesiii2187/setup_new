@@ -1,34 +1,54 @@
 #!/bin/sh
 
-if [[ -d "/workspace" || -d ".devcontainer" ]]; then
-  git clone --filter=blob:none --sparse https://github.com/whughesiii2187/dotfiles ~/dotfiles
-  cd ~/dotfiles/
-  git sparse-checkout set devc
-  cd devc
-  ./setup.sh
-else
-  git clone --filter=blob:none --sparse https://github.com/whughesiii2187/dotfiles ~/dotfiles
-  cd ~/dotfiles/
-  git sparse-checkout set default
-  cd default
-  stow -t ~ ghostty
-  # stow -t ~ nvim
-  stow -t ~ tmux
+#!/usr/bin/env bash
+#
+# setup.sh — entry point for the desktop setup.
+# Validates the requested mode, then hands it off as $1 to
+# install_all.sh, which does the actual per-mode work.
+#
+# Usage: ./setup.sh <mode>
+#   install   - baseline packages/config common to every setup
+#   dms       - DankMaterialShell + its requirements
+#   omarchy   - Omarchy-specific setup
+#   hyprland  - vanilla Hyprland + default Quickshell base
+#   devc      - devcontainer only: brew + devcontainer dotfiles, then exit
 
-  if [ -f "$HOME/.zshrc" ]; then
-    rm $HOME/.zshrc
-    stow -t ~ zshrc
-  fi
-  # if [ -d ~/.local/share/omarchy ]; then ## Fix this because omarchy changed shit
-    stow -t ~ omarchy
-    rm -rf ~/.config/tmux
-  # fi
- 
-  # OS Specific
-  if [ "$(uname)" = "Darwin" ]; then
-    stow -t ~ aerospace
-    stow -t ~ sketchybar
-    stow -t ~ macoszshrc
-  fi
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+VALID_MODES=(install dms omarchy hyprland devc)
+
+usage() {
+    echo "Usage: $0 <mode>" >&2
+    echo "  mode must be one of: ${VALID_MODES[*]}" >&2
+    exit 1
+}
+
+if [[ $# -ne 1 ]]; then
+    usage
 fi
 
+MODE="$1"
+
+is_valid=false
+for m in "${VALID_MODES[@]}"; do
+    if [[ "$MODE" == "$m" ]]; then
+        is_valid=true
+        break
+    fi
+done
+
+if [[ "$is_valid" != true ]]; then
+    echo "Error: unrecognized mode '$MODE'" >&2
+    usage
+fi
+
+echo "==> setup mode: $MODE"
+
+INSTALL_ALL="$SCRIPT_DIR/scripts/install_all.sh"
+if [[ ! -x "$INSTALL_ALL" ]]; then
+    echo "Error: $INSTALL_ALL not found or not executable" >&2
+    exit 1
+fi
+
+"$INSTALL_ALL" "$MODE"

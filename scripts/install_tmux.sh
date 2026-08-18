@@ -8,4 +8,6 @@ if command -v dnf &> /dev/null; then
   sudo dnf install -y tmux
 fi
 
-git clone https://github.com/tmux-plugins/tpm ~/dotfiles/default/tmux/.tmux/plugins/tpm
+if [ ! -d ~/.tmux/plugins/tpm ]; then
+  git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+fi
