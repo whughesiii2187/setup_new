@@ -10,9 +10,6 @@ fi
 
 sudo -v
 
-## A little directory cleanup just in case 
-rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/.local/share/nvim/
-
 ## Install Dank or skip ##
 if [[ "$1" == "dms" ]]; then
   # install.danklinux.com's bootstrap script doesn't forward args to the
@@ -64,6 +61,9 @@ fi
 if [ -d "$HOME/dotfiles" ]; then
   echo "Dotfiles appear to be installed already, skipping"
 else
+  # Directory cleanup so stow can symlink cleanly, even if ghostty/nvim/tmux
+  # were installed (and their default configs created) by steps above.
+  rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/.local/share/nvim/
   ./install_dotfiles.sh
 fi
 
