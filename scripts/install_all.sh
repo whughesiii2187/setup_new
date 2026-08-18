@@ -8,6 +8,9 @@ cd "$(dirname "$0")"
 LOG_DIR="$(cd .. && pwd)/logs"
 mkdir -p "$LOG_DIR"
 LOG_FILE="$LOG_DIR/install-$(date +%Y%m%d-%H%M%S).log"
+# Keep a handle on the real terminal before we redirect fd1/2 through tee,
+# so TUI installers (e.g. dank's) can still get a real TTY further down.
+exec 3>&1 4>&2
 exec > >(tee -a "$LOG_FILE") 2>&1
 echo "==> Logging to $LOG_FILE"
 
@@ -19,6 +22,22 @@ FAILED_STEPS=""
 run_step() {
   echo "==> [$(date '+%H:%M:%S')] $*"
   "$@"
+  status=$?
+  if [ "$status" -ne 0 ]; then
+    echo "!!  [$(date '+%H:%M:%S')] FAILED (exit $status): $*"
+    FAILED_STEPS="$FAILED_STEPS
+  - $* (exit $status)"
+  fi
+  return "$status"
+}
+
+## Like run_step, but gives the child a real TTY on stdout/stderr instead
+## of the log-file tee pipe. Needed for installers that render a live TUI
+## (e.g. dank's bubbletea-based installer), which fail to start when their
+## stdout isn't a terminal. This step's output won't land in the log file.
+run_step_tty() {
+  echo "==> [$(date '+%H:%M:%S')] $*"
+  "$@" 1>&3 2>&4
   status=$?
   if [ "$status" -ne 0 ]; then
     echo "!!  [$(date '+%H:%M:%S')] FAILED (exit $status): $*"
@@ -56,7 +75,7 @@ if [[ "$1" == "dms" ]]; then
   DANK_BOOTSTRAP=$(mktemp)
   curl -fsSL https://install.danklinux.com -o "$DANK_BOOTSTRAP"
   sed -i 's|^\./installer$|./installer -c hyprland -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar|' "$DANK_BOOTSTRAP"
-  run_step bash "$DANK_BOOTSTRAP"
+  run_step_tty bash "$DANK_BOOTSTRAP"
   rm -f "$DANK_BOOTSTRAP"
 fi
 
