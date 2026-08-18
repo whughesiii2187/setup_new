@@ -22,7 +22,7 @@ if [[ "$1" == "dms" ]]; then
   # to pass our flags through before running it.
   DANK_BOOTSTRAP=$(mktemp)
   curl -fsSL https://install.danklinux.com -o "$DANK_BOOTSTRAP"
-  sed -i 's|^\./installer$|./installer -c hyprland -t ghostty -y|' "$DANK_BOOTSTRAP"
+  sed -i 's|^\./installer$|./installer -c hyprland -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar|' "$DANK_BOOTSTRAP"
   bash "$DANK_BOOTSTRAP"
   rm -f "$DANK_BOOTSTRAP"
 fi
