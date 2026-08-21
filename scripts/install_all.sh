@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 cd "$(dirname "$0")"
 
@@ -94,18 +94,18 @@ run_step ./install_ufw.sh
 
 ## Omarchy overrides ##
 if [[ "$1" == "omarchy" ]]; then
-  if command -v yay &> /dev/null; then
+  if command -v yay &>/dev/null; then
     yay -S --noconfirm --needed jq
   fi
-  if command -v dnf &> /dev/null; then
+  if command -v dnf &>/dev/null; then
     sudo dnf install -y jq
   fi
 
   HYPR_VERSION=$(hyprland --version-json | jq '.version')
   if [[ "$HYPR_VERSION" > "0.55.0" ]]; then
-    echo "require(\"omarchy_overrides\")" >> ~/.config/hypr/hyprland.lua
+    echo "require(\"omarchy_overrides\")" >>~/.config/hypr/hyprland.lua
   else
-    echo "source = ~/.config/hypr/omarchy_overrides.conf" >> ~/.config/hypr/hyprland.conf
+    echo "source = ~/.config/hypr/omarchy_overrides.conf" >>~/.config/hypr/hyprland.conf
   fi
 
   #debloat omarchy
@@ -121,4 +121,3 @@ else
   rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/.local/share/nvim/
   run_step ./install_dotfiles.sh
 fi
-
