@@ -7,8 +7,6 @@ echo "/home/linuxbrew/.linuxbrew/bin/zsh" | sudo tee -a /etc/shells
 echo "Installing oh-my-zsh"
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
 
-./install_tmux.sh
-
 git clone --filter=blob:none --sparse https://github.com/whughesiii2187/dotfiles ~/dotfiles
 cd ~/dotfiles/
 git sparse-checkout set nvim tmux-devc zshrc-devc
