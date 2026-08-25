@@ -21,13 +21,23 @@ FAILED_STEPS=""
 ## been allowed to fail without stopping the overall install. ##
 run_step() {
   echo "==> [$(date '+%H:%M:%S')] $*"
-  "$@"
+  # Also capture this step's own output to a scratch file so that, on
+  # failure, we can reprint its tail right here. The full log already has
+  # it via the top-level tee, but a long step (e.g. brew installing a
+  # dozen formulas) can push the actual error off the top of a small
+  # terminal before the FAILED line even appears.
+  step_log="$(mktemp)"
+  "$@" > >(tee "$step_log") 2>&1
   status=$?
   if [ "$status" -ne 0 ]; then
     echo "!!  [$(date '+%H:%M:%S')] FAILED (exit $status): $*"
+    echo "---- last 30 lines of output from this step ----"
+    tail -n 30 "$step_log"
+    echo "---- end ----"
     FAILED_STEPS="$FAILED_STEPS
   - $* (exit $status)"
   fi
+  rm -f "$step_log"
   return "$status"
 }
 
