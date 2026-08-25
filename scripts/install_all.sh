@@ -81,11 +81,11 @@ install_dank() {
 
 install_gnome() {
   sudo dnf group install -y workstation-product
+  sudo systemctl enable gdm
 }
 
 install_cosmic() {
   sudo dnf group install -y cosmic-desktop cosmic-desktop-apps
-  sudo systemctl enable gdm
 }
 
 install_kde() {
