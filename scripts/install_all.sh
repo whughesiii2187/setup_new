@@ -85,6 +85,7 @@ install_gnome() {
 
 install_cosmic() {
   sudo dnf group install -y cosmic-desktop cosmic-desktop-apps
+  sudo systemctl enable gdm
 }
 
 install_kde() {
