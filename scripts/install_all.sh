@@ -66,7 +66,7 @@ fi
 sudo -v
 
 ## Install Dank or skip ##
-if [[ "$1" == "dms" ]]; then
+install_dank() {
   # install.danklinux.com's bootstrap script doesn't forward args to the
   # dankinstall binary it downloads (it just runs `./installer` with none),
   # so passing flags via `sh -s --` silently gets dropped and it falls back
@@ -77,23 +77,22 @@ if [[ "$1" == "dms" ]]; then
   sed -i 's|^\./installer$|./installer -c hyprland -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar|' "$DANK_BOOTSTRAP"
   run_step_tty bash "$DANK_BOOTSTRAP"
   rm -f "$DANK_BOOTSTRAP"
-fi
+}
 
-## Install pakcages I use ##
-if [[ "$1" != "dms" ]]; then
-  run_step ./install_ghostty.sh
-fi
-run_step ./install_bitwarden.sh
-run_step ./install_stow.sh
-run_step ./install_brew.sh
-run_step ./install_printer.sh
-run_step ./install_zsh.sh
-run_step ./install_vpn.sh
-run_step ./install_tmux.sh
-run_step ./install_ufw.sh
+install_gnome() {
+  sudo dnf group install -y workstation-product
+}
 
-## Omarchy overrides ##
-if [[ "$1" == "omarchy" ]]; then
+install_cosmic() {
+  sudo dnf group install -y cosmic-desktop cosmic-desktop-apps
+}
+
+install_kde() {
+  sudo dnf group install -y "KDE Plasma Workspaces"
+}
+
+install_omarchy() {
+  ## Omarchy overrides ##
   if command -v yay &>/dev/null; then
     yay -S --noconfirm --needed jq
   fi
@@ -110,7 +109,28 @@ if [[ "$1" == "omarchy" ]]; then
 
   #debloat omarchy
   run_step bash <(curl -fsSL https://raw.githubusercontent.com/DanielCoffey1/a-la-carchy/master/a-la-carchy.sh)
+}
+
+case $1 in
+dms) install_dank ;;
+kde) install_kde ;;
+gnome) install_gnome ;;
+cosmic) install_cosmic ;;
+omarchy) install_omarchy ;;
+esac
+
+## Install pakcages I use ##
+if [[ "$1" != "dms" ]]; then
+  run_step ./install_ghostty.sh
 fi
+run_step ./install_bitwarden.sh
+run_step ./install_stow.sh
+run_step ./install_brew.sh
+run_step ./install_printer.sh
+run_step ./install_zsh.sh
+run_step ./install_vpn.sh
+run_step ./install_tmux.sh
+run_step ./install_ufw.sh
 
 ## Clone and Stow Dotfiles ##
 if [ -d "$HOME/dotfiles" ]; then

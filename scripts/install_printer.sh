@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 sudo systemctl disable --now avahi-daemon
 
 if command -v yay &> /dev/null; then 

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # ------------------------------------------------------
 # Install Script for Libvirt
 # ------------------------------------------------------
@@ -9,7 +9,13 @@ echo "START KVM/QEMU/VIRT MANAGER INSTALLATION..."
 # ------------------------------------------------------
 # Install Packages
 # ------------------------------------------------------
-yay -S --needed libvirt virt-manager virt-viewer qemu vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf swtpm
+if command -v yay &>/dev/null; then
+  yay -S --needed libvirt virt-manager virt-viewer qemu-full vde2 ebtables iptables-nft nftables dnsmasq bridge-utils ovmf swtpm
+fi
+
+if command -v dnf &>/dev/null; then
+  sudo dnf install -y libvirt virt-manager virt-viewer qemu-kvm ebtables iptables-nft nftables dnsmasq bridge-utils edk2-ovmf swtpm #vde2
+fi
 
 # ------------------------------------------------------
 # Edit libvirtd.conf
@@ -20,8 +26,8 @@ echo "Open sudo nvim /etc/libvirt/libvirtd.conf:"
 echo 'Remove # at the following lines: unix_sock_group = "libvirt" and unix_sock_rw_perms = "0770"'
 read -p "Press any key to open libvirtd.conf: " c
 sudo nvim /etc/libvirt/libvirtd.conf
-sudo echo 'log_filters="3:qemu 1:libvirt"' >> /etc/libvirt/libvirtd.conf
-sudo echo 'log_outputs="2:file:/var/log/libvirt/libvirtd.log"' >> /etc/libvirt/libvirtd.conf
+sudo echo 'log_filters="3:qemu 1:libvirt"' >>/etc/libvirt/libvirtd.conf
+sudo echo 'log_outputs="2:file:/var/log/libvirt/libvirtd.log"' >>/etc/libvirt/libvirtd.conf
 
 # ------------------------------------------------------
 # Add user to the group

@@ -5,16 +5,17 @@
 # install_all.sh, which does the actual per-mode work.
 #
 # Usage: ./setup.sh <mode>
-#   install   - baseline packages/config common to every setup
 #   dms       - DankMaterialShell + its requirements
 #   omarchy   - Omarchy-specific setup
-#   hyprland  - vanilla Hyprland + default Quickshell base
+#   gnome     - GNOME desktop (workstation-product group) + common packages
+#   kde       - KDE Plasma Workspaces + common packages
+#   cosmic    - COSMIC desktop + common packages
 #   devc      - devcontainer only: brew + devcontainer dotfiles, then exit
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-VALID_MODES=(install dms omarchy hyprland devc)
+VALID_MODES=(dms omarchy gnome kde cosmic devc)
 
 usage() {
   echo "Usage: $0 <mode>" >&2

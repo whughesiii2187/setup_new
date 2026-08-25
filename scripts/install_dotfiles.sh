@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 git clone --filter=blob:none --sparse https://github.com/whughesiii2187/dotfiles ~/dotfiles
 cd ~/dotfiles/

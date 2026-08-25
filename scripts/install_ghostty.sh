@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 if command -v yay &> /dev/null; then
   yay -S --needed --noconfirm ghostty
