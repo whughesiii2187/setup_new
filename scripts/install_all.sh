@@ -2,30 +2,17 @@
 
 cd "$(dirname "$0")"
 
-## Logging: mirror everything to a timestamped file so failures (e.g. a
-## step that silently no-ops instead of erroring) are visible after the
-## fact, not just on a scrollback the user may not have kept. ##
 LOG_DIR="$(cd .. && pwd)/logs"
 mkdir -p "$LOG_DIR"
 LOG_FILE="$LOG_DIR/install-$(date +%Y%m%d-%H%M%S).log"
-# Keep a handle on the real terminal before we redirect fd1/2 through tee,
-# so TUI installers (e.g. dank's) can still get a real TTY further down.
 exec 3>&1 4>&2
 exec > >(tee -a "$LOG_FILE") 2>&1
 echo "==> Logging to $LOG_FILE"
 
 FAILED_STEPS=""
 
-## Run a step, logging its start/end and recording (without aborting the
-## rest of the run) whether it failed, since individual steps have always
-## been allowed to fail without stopping the overall install. ##
 run_step() {
   echo "==> [$(date '+%H:%M:%S')] $*"
-  # Also capture this step's own output to a scratch file so that, on
-  # failure, we can reprint its tail right here. The full log already has
-  # it via the top-level tee, but a long step (e.g. brew installing a
-  # dozen formulas) can push the actual error off the top of a small
-  # terminal before the FAILED line even appears.
   step_log="$(mktemp)"
   "$@" > >(tee "$step_log") 2>&1
   status=$?
@@ -41,10 +28,6 @@ run_step() {
   return "$status"
 }
 
-## Like run_step, but gives the child a real TTY on stdout/stderr instead
-## of the log-file tee pipe. Needed for installers that render a live TUI
-## (e.g. dank's bubbletea-based installer), which fail to start when their
-## stdout isn't a terminal. This step's output won't land in the log file.
 run_step_tty() {
   echo "==> [$(date '+%H:%M:%S')] $*"
   "$@" 1>&3 2>&4
@@ -77,11 +60,6 @@ sudo -v
 
 ## Install Dank or skip ##
 install_dank() {
-  # install.danklinux.com's bootstrap script doesn't forward args to the
-  # dankinstall binary it downloads (it just runs `./installer` with none),
-  # so passing flags via `sh -s --` silently gets dropped and it falls back
-  # to the interactive TUI. Work around it by patching the fetched script
-  # to pass our flags through before running it.
   DANK_BOOTSTRAP=$(mktemp)
   curl -fsSL https://install.danklinux.com -o "$DANK_BOOTSTRAP"
   sed -i 's|^\./installer$|./installer -c hyprland -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar|' "$DANK_BOOTSTRAP"
@@ -90,24 +68,7 @@ install_dank() {
 }
 
 install_gnome() {
-  if command -v dnf &>/dev/null; then
-    sudo dnf group install -y "GNOME Desktop"
-    sudo systemctl set-default graphical.target
-    sudo dnf install -y gnome-tweaks
-  fi
-  if command -v yay &>/dev/null; then
-    yay -S --noconfirm --needed gnome gdm
-    sudo systemctl enable gdm
-  fi
-  echo -e "\033[33mConfiguring power settings...\033[0m"
-  sudo -u $ACTUAL_USER gsettings set org.gnome.desktop.session idle-delay 0 >/dev/null 2>&1
-  sudo -u $ACTUAL_USER gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing' >/dev/null 2>&1
-  sudo -u $ACTUAL_USER gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type 'nothing' >/dev/null 2>&1
-  sudo -u $ACTUAL_USER gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 0 >/dev/null 2>&1
-  sudo -u $ACTUAL_USER gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 0 >/dev/null 2>&1
-  sudo -u $ACTUAL_USER gsettings set org.gnome.settings-daemon.plugins.power power-button-action 'suspend' >/dev/null 2>&1
-
-  flatpak install -y flathub com.mattjakeman.ExtensionManager >/dev/null 2>&1
+  run_step ./install_gnome.sh
 }
 
 install_cosmic() {
@@ -119,23 +80,7 @@ install_kde() {
 }
 
 install_omarchy() {
-  ## Omarchy overrides ##
-  if command -v yay &>/dev/null; then
-    yay -S --noconfirm --needed jq
-  fi
-  if command -v dnf &>/dev/null; then
-    sudo dnf install -y jq
-  fi
-
-  HYPR_VERSION=$(hyprland --version-json | jq '.version')
-  if [[ "$HYPR_VERSION" > "0.55.0" ]]; then
-    echo "require(\"omarchy_overrides\")" >>~/.config/hypr/hyprland.lua
-  else
-    echo "source = ~/.config/hypr/omarchy_overrides.conf" >>~/.config/hypr/hyprland.conf
-  fi
-
-  #debloat omarchy
-  run_step bash <(curl -fsSL https://raw.githubusercontent.com/DanielCoffey1/a-la-carchy/master/a-la-carchy.sh)
+  run_step ./install_omarchy.sh
 }
 
 case $1 in
@@ -158,6 +103,16 @@ run_step ./install_zsh.sh
 run_step ./install_vpn.sh
 run_step ./install_tmux.sh
 run_step ./install_ufw.sh
+run_step ./install_docker.sh
+run_step ./install_essentials.sh
+run_step ./install_firefox.sh
+run_step ./install_freetube.sh
+run_step ./install_office.sh
+run_step ./install_qbittorrent.sh
+run_step ./install_spotify.sh
+run_step ./install_tor.sh
+run_step ./install_vlc.sh
+run_step ./install_whatsapp.sh
 
 ## Clone and Stow Dotfiles ##
 if [ -d "$HOME/dotfiles" ]; then
