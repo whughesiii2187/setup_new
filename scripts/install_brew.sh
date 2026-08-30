@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
+# Homebrew's gcc formula runs a postinstall step that shells out to the
+# system `cc`; without a system compiler present that step fails and takes
+# the whole `brew install` (and this script, under set -e) down with it.
+if command -v dnf &>/dev/null; then
+  sudo dnf install -y gcc gcc-c++ make
+elif command -v yay &>/dev/null; then
+  yay -S --noconfirm --needed base-devel
+fi
+
 if [ ! -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
   # Fetch to a file and check curl's own exit status first: piping a failed
   # curl straight into `bash -c "$(...)"` silently becomes `bash -c ""`,

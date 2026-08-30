@@ -153,5 +153,5 @@ else
   # Directory cleanup so stow can symlink cleanly, even if ghostty/nvim/tmux
   # were installed (and their default configs created) by steps above.
   rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/.local/share/nvim/
-  run_step ./install_dotfiles.sh
+  run_step ./install_dotfiles.sh "$1"
 fi

@@ -3,10 +3,10 @@
 if command -v dnf &>/dev/null; then
   sudo dnf group install -y "GNOME Desktop"
   sudo systemctl set-default graphical.target
-  sudo dnf install -y gnome-tweaks
+  sudo dnf install -y gnome-tweaks flatpak
 fi
 if command -v yay &>/dev/null; then
-  yay -S --noconfirm --needed gnome gdm
+  yay -S --noconfirm --needed gnome gdm flatpak
   sudo systemctl enable gdm
 fi
 echo -e "\033[33mConfiguring power settings...\033[0m"
