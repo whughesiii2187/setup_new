@@ -60,11 +60,19 @@ sudo -v
 
 ## Install Dank or skip ##
 install_dank() {
+  local compositor="${1:-hyprland}"
   DANK_BOOTSTRAP=$(mktemp)
   curl -fsSL https://install.danklinux.com -o "$DANK_BOOTSTRAP"
-  sed -i 's|^\./installer$|./installer -c hyprland -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar|' "$DANK_BOOTSTRAP"
+  sed -i "s|^\\./installer\$|./installer -c ${compositor} -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar|" "$DANK_BOOTSTRAP"
   run_step_tty bash "$DANK_BOOTSTRAP"
   rm -f "$DANK_BOOTSTRAP"
+
+  ## Dank overrides ##
+  if [ "$compositor" = "niri" ]; then
+    echo "include optional=true \"dank_overrides.kdl\"" >>~/.config/niri/config.kdl
+  else
+    echo "require(\"dank_overrides\")" >>~/.config/hypr/hyprland.lua
+  fi
 }
 
 install_gnome() {
@@ -84,7 +92,7 @@ install_omarchy() {
 }
 
 case $1 in
-dms) install_dank ;;
+dms) install_dank "$2" ;;
 kde) install_kde ;;
 gnome) install_gnome ;;
 cosmic) install_cosmic ;;
