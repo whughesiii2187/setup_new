@@ -50,26 +50,6 @@ sudo dnf config-manager setopt fedora-cisco-openh264.enabled=1
 # Install virtualization tools to enable virtual machines and containerization
 sudo dnf install -y @virtualization
 
-# Install essential applications
-sudo dnf install -y btop inxi unzip unrar git wget curl gnome-tweaks
-
-# Install Coding and DevOps applications
-sudo dnf remove -y docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine --noautoremove
-sudo dnf -y install dnf-plugins-core
-if command -v dnf4 &>/dev/null; then
-
-  sudo dnf4 config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-else
-
-  sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
-fi
-sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-sudo systemctl enable --now docker
-sudo systemctl enable --now containerd
-sudo groupadd docker
-sudo usermod -aG docker $USER
-rm -rf $HOME/.docker
-
 ### Optimizations ###
 sudo systemctl disable NetworkManager-wait-online.service
 mkdir -p ~/.config/autostart

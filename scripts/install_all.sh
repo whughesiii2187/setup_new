@@ -97,11 +97,11 @@ install_gnome() {
 }
 
 install_cosmic() {
-  sudo dnf group install -y cosmic-desktop cosmic-desktop-apps
+  run_step ./install_cosmic.sh
 }
 
 install_kde() {
-  sudo dnf group install -y "KDE Plasma Workspaces"
+  run_step ./install_kde.sh
 }
 
 install_omarchy() {
