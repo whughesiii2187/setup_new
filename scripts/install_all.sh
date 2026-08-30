@@ -30,7 +30,17 @@ run_step() {
 
 run_step_tty() {
   echo "==> [$(date '+%H:%M:%S')] $*"
-  "$@" 1>&3 2>&4
+  if command -v script &>/dev/null; then
+    # A plain pipe/tee here would turn stdout into a non-tty, which breaks
+    # installers (like Dank's) that rely on isatty() for prompts/spinners.
+    # `script` allocates a real pty for the child so it stays interactive,
+    # while still recording the session to $LOG_FILE.
+    local cmd
+    printf -v cmd '%q ' "$@"
+    script --quiet --append --return --flush --command "$cmd" "$LOG_FILE" 1>&3 2>&4
+  else
+    "$@" 1>&3 2>&4
+  fi
   status=$?
   if [ "$status" -ne 0 ]; then
     echo "!!  [$(date '+%H:%M:%S')] FAILED (exit $status): $*"
@@ -62,20 +72,19 @@ sudo -v
 install_dank() {
   local compositor="${1:-hyprland}"
   DANK_BOOTSTRAP=$(mktemp)
-  curl -fsSL https://install.danklinux.com -o "$DANK_BOOTSTRAP"
+  if ! curl -fsSL https://install.danklinux.com -o "$DANK_BOOTSTRAP"; then
+    echo "!!  [$(date '+%H:%M:%S')] FAILED to download Dank bootstrap script"
+    FAILED_STEPS="$FAILED_STEPS
+  - install_dank: curl https://install.danklinux.com (download failed)"
+    rm -f "$DANK_BOOTSTRAP"
+    return 1
+  fi
   sed -i "s|^\\./installer\$|./installer -c ${compositor} -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar|" "$DANK_BOOTSTRAP"
   run_step_tty bash "$DANK_BOOTSTRAP"
   rm -f "$DANK_BOOTSTRAP"
 
   ## Dank overrides ##
   if [ "$compositor" = "niri" ]; then
-    # dms/outputs.kdl matches monitors by connector name (DP-1, DP-8, ...),
-    # which shifts on this hardware (dock/Thunderbolt monitors get renamed
-    # on every suspend/resume) and wins over dank_overrides.kdl's
-    # manufacturer/model/serial-matched output blocks whenever both match the
-    # same connector -- causing declared positions to silently fall back to
-    # automatic placement. Drop the include so dank_overrides.kdl's output
-    # config is the only one in effect.
     sed -i '/include optional=true "dms\/outputs.kdl"/d' ~/.config/niri/config.kdl
     echo "include optional=true \"dank_overrides.kdl\"" >>~/.config/niri/config.kdl
   else
@@ -107,10 +116,17 @@ cosmic) install_cosmic ;;
 omarchy) install_omarchy ;;
 esac
 
+. /etc/os-release
+
+if [ "$ID" == "fedora" ]; then
+  run_step ./install_fedora.sh
+fi
+
 ## Install pakcages I use ##
 if [[ "$1" != "dms" ]]; then
   run_step ./install_ghostty.sh
 fi
+
 run_step ./install_bitwarden.sh
 run_step ./install_stow.sh
 run_step ./install_brew.sh

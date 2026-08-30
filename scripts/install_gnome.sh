@@ -10,11 +10,11 @@ if command -v yay &>/dev/null; then
   sudo systemctl enable gdm
 fi
 echo -e "\033[33mConfiguring power settings...\033[0m"
-sudo -u $ACTUAL_USER gsettings set org.gnome.desktop.session idle-delay 0 >/dev/null 2>&1
-sudo -u $ACTUAL_USER gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing' >/dev/null 2>&1
-sudo -u $ACTUAL_USER gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type 'nothing' >/dev/null 2>&1
-sudo -u $ACTUAL_USER gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 0 >/dev/null 2>&1
-sudo -u $ACTUAL_USER gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 0 >/dev/null 2>&1
-sudo -u $ACTUAL_USER gsettings set org.gnome.settings-daemon.plugins.power power-button-action 'suspend' >/dev/null 2>&1
+gsettings set org.gnome.desktop.session idle-delay 0
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-type 'nothing'
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 0
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 0
+gsettings set org.gnome.settings-daemon.plugins.power power-button-action 'suspend'
 
-flatpak install -y flathub com.mattjakeman.ExtensionManager >/dev/null 2>&1
+flatpak install -y flathub com.mattjakeman.ExtensionManager
