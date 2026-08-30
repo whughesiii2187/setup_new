@@ -68,7 +68,7 @@ fi
 
 sudo -v
 
-## Install Dank or skip ##
+## Install Dank ##
 install_dank() {
   local compositor="${1:-hyprland}"
   DANK_BOOTSTRAP=$(mktemp)
