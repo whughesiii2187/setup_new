@@ -4,8 +4,9 @@
 # Validates the requested mode, then hands it off as $1 to
 # install_all.sh, which does the actual per-mode work.
 #
-# Usage: ./setup.sh <mode>
+# Usage: ./setup.sh <mode> [compositor]
 #   dms       - DankMaterialShell + its requirements
+#               optional [compositor]: hyprland (default) or niri
 #   omarchy   - Omarchy-specific setup
 #   gnome     - GNOME desktop (workstation-product group) + common packages
 #   kde       - KDE Plasma Workspaces + common packages
@@ -18,12 +19,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VALID_MODES=(dms omarchy gnome kde cosmic devc)
 
 usage() {
-  echo "Usage: $0 <mode>" >&2
+  echo "Usage: $0 <mode> [compositor]" >&2
   echo "  mode must be one of: ${VALID_MODES[*]}" >&2
+  echo "  compositor (only used with 'dms'): hyprland (default) or niri" >&2
   exit 1
 }
 
-if [[ $# -ne 1 ]]; then
+if [[ $# -lt 1 || $# -gt 2 ]]; then
   usage
 fi
 
@@ -50,4 +52,4 @@ if [[ ! -x "$INSTALL_ALL" ]]; then
   exit 1
 fi
 
-"$INSTALL_ALL" "$MODE"
+"$INSTALL_ALL" "$MODE" "${2:-}"
