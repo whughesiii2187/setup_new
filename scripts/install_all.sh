@@ -69,6 +69,14 @@ install_dank() {
 
   ## Dank overrides ##
   if [ "$compositor" = "niri" ]; then
+    # dms/outputs.kdl matches monitors by connector name (DP-1, DP-8, ...),
+    # which shifts on this hardware (dock/Thunderbolt monitors get renamed
+    # on every suspend/resume) and wins over dank_overrides.kdl's
+    # manufacturer/model/serial-matched output blocks whenever both match the
+    # same connector -- causing declared positions to silently fall back to
+    # automatic placement. Drop the include so dank_overrides.kdl's output
+    # config is the only one in effect.
+    sed -i '/include optional=true "dms\/outputs.kdl"/d' ~/.config/niri/config.kdl
     echo "include optional=true \"dank_overrides.kdl\"" >>~/.config/niri/config.kdl
   else
     echo "require(\"dank_overrides\")" >>~/.config/hypr/hyprland.lua
