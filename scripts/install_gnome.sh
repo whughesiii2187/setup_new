@@ -17,4 +17,5 @@ gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-timeout 
 gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-battery-timeout 0
 gsettings set org.gnome.settings-daemon.plugins.power power-button-action 'suspend'
 
+sudo flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 flatpak install -y flathub com.mattjakeman.ExtensionManager
