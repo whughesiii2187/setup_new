@@ -2,7 +2,7 @@
 
 cd "$(dirname "$0")"
 
-./install_brew.sh
+./install_brew.sh "$1"
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 echo "/home/linuxbrew/.linuxbrew/bin/zsh" | sudo tee -a /etc/shells
 

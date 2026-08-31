@@ -37,4 +37,9 @@ until brew update; do
   attempt=$((attempt + 1))
 done
 
-brew install neovim fzf lazygit zsh tmux claude-code font-0xproto-nerd-font gcc clipboard ripgrep tree-sitter-cli stow devcontainer
+if [ "$1" = "devc" ]; then
+  brew install neovim fzf lazygit zsh tmux claude-code font-0xproto-nerd-font gcc clipboard ripgrep tree-sitter-cli stow devcontainer
+else
+  # neovim, zsh, tmux, and stow are installed by their own install_*.sh scripts instead.
+  brew install fzf lazygit claude-code font-0xproto-nerd-font gcc clipboard ripgrep tree-sitter-cli
+fi

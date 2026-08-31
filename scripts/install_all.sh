@@ -62,7 +62,7 @@ trap print_summary EXIT
 
 ## Devcontainer mode: minimal setup, nothing desktop-specific ##
 if [ "$1" = "devc" ]; then
-  run_step ./install_devcontainerdots.sh
+  run_step ./install_devcontainerdots.sh "$1"
   exit 0
 fi
 
@@ -129,7 +129,7 @@ fi
 
 run_step ./install_bitwarden.sh
 run_step ./install_stow.sh
-run_step ./install_brew.sh
+run_step ./install_brew.sh "$1"
 run_step ./install_printer.sh
 run_step ./install_zsh.sh
 run_step ./install_vpn.sh
@@ -140,6 +140,7 @@ run_step ./install_essentials.sh
 run_step ./install_firefox.sh
 run_step ./install_freetube.sh
 run_step ./install_office.sh
+run_step ./install_neovim.sh
 run_step ./install_qbittorrent.sh
 run_step ./install_spotify.sh
 run_step ./install_tor.sh
