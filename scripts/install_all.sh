@@ -140,7 +140,7 @@ run_step ./install_essentials.sh
 run_step ./install_firefox.sh
 run_step ./install_freetube.sh
 run_step ./install_office.sh
-run_step ./install_neovim.sh
+run_step ./install_nvim.sh
 run_step ./install_qbittorrent.sh
 run_step ./install_spotify.sh
 run_step ./install_tor.sh
