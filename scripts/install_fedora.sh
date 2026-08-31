@@ -52,7 +52,9 @@ sudo dnf install -y @virtualization
 
 ### Optimizations ###
 sudo systemctl disable NetworkManager-wait-online.service
-mkdir -p ~/.config/autostart
-cp /usr/share/applications/org.gnome.Software.desktop ~/.config/autostart/
-echo "X-GNOME-Autostart-enabled=false" >>~/.config/autostart/org.gnome.Software.desktop
-dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.desktop']"
+if [ -f /usr/share/applications/org.gnome.Software.desktop ]; then
+  mkdir -p ~/.config/autostart
+  cp /usr/share/applications/org.gnome.Software.desktop ~/.config/autostart/
+  echo "X-GNOME-Autostart-enabled=false" >>~/.config/autostart/org.gnome.Software.desktop
+  dconf write /org/gnome/desktop/search-providers/disabled "['org.gnome.Software.desktop']"
+fi
