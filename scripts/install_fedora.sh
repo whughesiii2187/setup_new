@@ -8,6 +8,10 @@ sudo dnf upgrade -y
 # Optimize DNF package manager for faster downloads and efficient updates
 sudo cp "/etc/dnf/dnf.conf" "/etc/dnf/dnf.conf.bak"
 sudo dnf -y install dnf-plugins-core
+echo "gpgcheck=True" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
+echo "installonly_limit=3" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
+echo "clean_requirements_on_remove=True" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
+echo "best=True" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
 echo "max_parallel_downloads=10" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
 echo "fastestmirror=True" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
 echo "defaultyes=True" | sudo tee -a /etc/dnf/dnf.conf >/dev/null

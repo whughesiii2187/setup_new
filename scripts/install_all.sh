@@ -120,6 +120,7 @@ esac
 
 if [ "$ID" == "fedora" ]; then
   run_step ./install_fedora.sh
+  run_step ./install_snapper.sh
 fi
 
 ## Install pakcages I use ##
