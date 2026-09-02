@@ -79,8 +79,7 @@ install_dank() {
     rm -f "$DANK_BOOTSTRAP"
     return 1
   fi
-  sed -i "s|^\\./installer\$|./installer -c ${compositor} -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar|" "$DANK_BOOTSTRAP"
-  run_step_tty bash "$DANK_BOOTSTRAP"
+  run_step_tty bash "$DANK_BOOTSTRAP" -c "${compositor}" -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar
   rm -f "$DANK_BOOTSTRAP"
 
   ## Dank overrides ##
