@@ -82,6 +82,13 @@ install_dank() {
   run_step_tty bash "$DANK_BOOTSTRAP" -c "${compositor}" -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar
   rm -f "$DANK_BOOTSTRAP"
 
+  for repo in avengemedia:danklinux avengemedia:dms; do
+    repo_file="/etc/yum.repos.d/_copr:copr.fedorainfracloud.org:${repo}.repo"
+    if [ -f "$repo_file" ] && ! grep -q '^priority=' "$repo_file"; then
+      sudo sh -c "echo 'priority=1' >> '$repo_file'"
+    fi
+  done
+
   ## Dank overrides ##
   if [ "$compositor" = "niri" ]; then
     sed -i '/include optional=true "dms\/outputs.kdl"/d' ~/.config/niri/config.kdl
