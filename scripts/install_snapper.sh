@@ -42,6 +42,10 @@ sudo systemctl daemon-reload
 sudo mount -a
 sudo restorecon -R /.snapshots /home/.snapshots
 
+root_id=$(sudo btrfs subvolume show / | awk '/Subvolume ID:/ {print $NF}')
+sudo btrfs subvolume set-default "$root_id" /
+sudo grubby --update-kernel=ALL --remove-args="rootflags=subvol=root"
+
 if grep -q '^SNAPPER_CONFIGS=' /etc/sysconfig/snapper 2>/dev/null; then
   sudo sed -i 's/^SNAPPER_CONFIGS=.*/SNAPPER_CONFIGS="root home"/' /etc/sysconfig/snapper
 else
