@@ -50,6 +50,21 @@ run_step_tty() {
   return "$status"
 }
 
+flatpak_install() {
+  local attempt
+  for attempt in 1 2 3; do
+    if flatpak install -y "$@"; then
+      return 0
+    fi
+    if [ "$attempt" -lt 3 ]; then
+      echo "flatpak install $* failed (attempt $attempt/3), retrying..." >&2
+      sleep 5
+    fi
+  done
+  return 1
+}
+export -f flatpak_install
+
 print_summary() {
   echo "==> Log saved to $LOG_FILE"
   if [ -n "$FAILED_STEPS" ]; then
@@ -80,7 +95,15 @@ install_dank() {
     return 1
   fi
   run_step_tty bash "$DANK_BOOTSTRAP" -c "${compositor}" -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar
+  if [ "$status" -ne 0 ]; then
+    echo "==> [$(date '+%H:%M:%S')] Dank install failed, retrying once..."
+    run_step_tty bash "$DANK_BOOTSTRAP" -c "${compositor}" -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar
+  fi
   rm -f "$DANK_BOOTSTRAP"
+  if [ "$status" -ne 0 ]; then
+    echo "!!  [$(date '+%H:%M:%S')] Dank install failed twice, aborting"
+    exit 1
+  fi
 
   for repo in avengemedia:danklinux avengemedia:dms; do
     repo_file="/etc/yum.repos.d/_copr:copr.fedorainfracloud.org:${repo}.repo"
