@@ -137,6 +137,16 @@ install_omarchy() {
   run_step ./install_omarchy.sh
 }
 
+. /etc/os-release
+
+if [ "$ID" == "fedora" ]; then
+  run_step ./install_fedora.sh
+fi
+
+if [ "$ID" == "arch" ]; then
+  run_step ./install_arch.sh
+fi
+
 case $1 in
 dms) install_dank "$2" ;;
 kde) install_kde ;;
@@ -144,13 +154,6 @@ gnome) install_gnome ;;
 cosmic) install_cosmic ;;
 omarchy) install_omarchy ;;
 esac
-
-. /etc/os-release
-
-if [ "$ID" == "fedora" ]; then
-  run_step ./install_fedora.sh
-  run_step ./install_snapper.sh
-fi
 
 ## Install pakcages I use ##
 if [[ "$1" != "dms" ]]; then
@@ -175,6 +178,7 @@ run_step ./install_qbittorrent.sh
 run_step ./install_spotify.sh
 run_step ./install_tor.sh
 run_step ./install_vlc.sh
+run_step ./install_snapper.sh
 run_step ./install_whatsapp.sh
 
 ## Clone and Stow Dotfiles ##

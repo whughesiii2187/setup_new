@@ -6,5 +6,6 @@ fi
 
 if command -v yay &>/dev/null; then
   yay -S --noconfirm --needed cosmic cosmic-greeter
-  sudo systemctl enable cosmic-greeter
 fi
+
+sudo systemctl enable cosmic-greeter
