@@ -21,19 +21,6 @@ sudo dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-r
 sudo dnf install -y https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 sudo dnf update @core -y
 
-### Flatpak ###
-# Replace Fedora Flatpak Repo with Flathub for better package management and apps stability
-sudo dnf install -y flatpak
-sudo systemctl disable flatpak-add-fedora-repos.service
-flatpak remote-delete fedora --force || true
-flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-sudo flatpak repair
-flatpak update
-
-### AppImage ###
-sudo dnf install -y fuse-libs
-flatpak_install it.mijorus.gearlever
-
 ### Media Codecs ###
 if command -v dnf4 &>/dev/null; then
   sudo dnf4 group install -y multimedia

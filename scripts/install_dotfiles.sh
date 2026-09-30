@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 
 MODE="$1"
+SHELL_ARG="$2"
 
 git clone --filter=blob:none --sparse https://github.com/whughesiii2187/dotfiles ~/dotfiles
 cd ~/dotfiles/
-git sparse-checkout set dank ghostty tmux zshrc omarchy nvim aerospace sketchybar zshrc-mac scripts wireplumber
+git sparse-checkout set dank ghostty tmux zshrc nvim aerospace sketchybar zshrc-mac scripts wireplumber hypr niri
 
 stow -t ~ ghostty
 stow -t ~ nvim
@@ -12,10 +13,14 @@ stow -t ~ tmux
 stow -t ~ wireplumber
 stow -t ~ scripts
 
-# dank and omarchy both ship .config/hypr/scripts/laptop-display.sh, so only
-# stow whichever one this run actually installed.
-if [ "$MODE" = "dms" ]; then
+if [ "$SHELL_ARG" = "dms" ]; then
   stow -t ~ dank
+fi
+
+if [ "$MODE" = "niri" ]; then
+  stow -t ~ niri
+elif [ "$MODE" = "hypr" ]; then
+  stow -t ~ hypr
 fi
 
 if [ -f "$HOME/.zshrc" ]; then
@@ -23,10 +28,6 @@ if [ -f "$HOME/.zshrc" ]; then
   stow -t ~ zshrc
 else
   stow -t ~ zshrc
-fi
-
-if [ "$MODE" = "omarchy" ]; then
-  stow -t ~ omarchy
 fi
 
 # OS Specific

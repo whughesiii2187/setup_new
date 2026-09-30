@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
-if command -v dnf &>/dev/null; then
-  flatpak_install flathub io.freetubeapp.FreeTube
-fi
+# native fallback, disabled in favor of flatpak — see install_flatpak.sh
+# if command -v yay &>/dev/null; then
+#   yay -S --noconfirm --needed freetube-bin
+# fi
+
+flatpak_install flathub io.freetubeapp.FreeTube

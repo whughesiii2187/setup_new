@@ -81,6 +81,17 @@ if [ "$1" = "devc" ]; then
   exit 0
 fi
 
+# MODE is a compositor (hypr/niri) or a standalone desktop mode
+# (gnome/kde/cosmic). SHELL_ARG is only meaningful alongside a
+# compositor: dms or noctalia.
+MODE="$1"
+SHELL_ARG="${2:-}"
+
+case "$MODE" in
+hypr) COMPOSITOR="hyprland" ;;
+niri) COMPOSITOR="niri" ;;
+esac
+
 sudo -v
 
 ## Install Dank ##
@@ -114,12 +125,34 @@ install_dank() {
 
   ## Dank overrides ##
   if [ "$compositor" = "niri" ]; then
-    sed -i '/include optional=true "dms\/outputs.kdl"/d' ~/.config/niri/config.kdl
     echo "include optional=true \"dank_overrides.kdl\"" >>~/.config/niri/config.kdl
   else
     echo "require(\"dank_overrides\")" >>~/.config/hypr/hyprland.lua
   fi
 }
+
+## Install compositor ##
+install_hyprland() {
+  run_step ./install_hyprland.sh
+}
+
+install_niri() {
+  run_step ./install_niri.sh
+}
+
+## Install Noctalia ##
+install_noctalia() {
+  run_step ./install_noctalia.sh
+}
+
+## Compositor overrides ##
+if [ "$MODE" = "hypr" ] || [ "$MODE" = "niri" ]; then
+  if [ "$MODE" = "niri" ]; then
+    echo "include optional=true \"niri_overrides.kdl\"" >>~/.config/niri/config.kdl
+  else
+    echo "require(\"hypr_overrides\")" >>~/.config/hypr/hyprland.lua
+  fi
+fi
 
 install_gnome() {
   run_step ./install_gnome.sh
@@ -133,10 +166,6 @@ install_kde() {
   run_step ./install_kde.sh
 }
 
-install_omarchy() {
-  run_step ./install_omarchy.sh
-}
-
 . /etc/os-release
 
 if [ "$ID" == "fedora" ]; then
@@ -147,22 +176,29 @@ if [ "$ID" == "arch" ]; then
   run_step ./install_arch.sh
 fi
 
-case $1 in
-dms) install_dank "$2" ;;
+run_step ./install_flatpak.sh
+
+case "$MODE" in
+hypr) install_hyprland ;;
+niri) install_niri ;;
 kde) install_kde ;;
 gnome) install_gnome ;;
 cosmic) install_cosmic ;;
-omarchy) install_omarchy ;;
+esac
+
+case "$SHELL_ARG" in
+dms) install_dank "$COMPOSITOR" ;;
+noctalia) install_noctalia ;;
 esac
 
 ## Install pakcages I use ##
-if [[ "$1" != "dms" ]]; then
+if [[ "$SHELL_ARG" != "dms" ]]; then
   run_step ./install_ghostty.sh
 fi
 
 run_step ./install_bitwarden.sh
 run_step ./install_stow.sh
-run_step ./install_brew.sh "$1"
+run_step ./install_brew.sh "$MODE"
 run_step ./install_printer.sh
 run_step ./install_zsh.sh
 run_step ./install_vpn.sh
@@ -170,7 +206,7 @@ run_step ./install_tmux.sh
 run_step ./install_ufw.sh
 run_step ./install_docker.sh
 run_step ./install_essentials.sh
-run_step ./install_firefox.sh
+run_step ./install_zen.sh
 run_step ./install_freetube.sh
 run_step ./install_office.sh
 run_step ./install_nvim.sh
@@ -188,5 +224,5 @@ else
   # Directory cleanup so stow can symlink cleanly, even if ghostty/nvim/tmux
   # were installed (and their default configs created) by steps above.
   rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/.local/share/nvim/
-  run_step ./install_dotfiles.sh "$1"
+  run_step ./install_dotfiles.sh "$MODE" "$SHELL_ARG"
 fi

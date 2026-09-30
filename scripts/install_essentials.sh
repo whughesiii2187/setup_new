@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
 echo -e "\033[33mInstalling essential applications...\033[0m"
+if command -v yay &>/dev/null; then
+  yay -S --noconfirm --needed btop inxi unzip unrar git wget curl
+fi
+
 if command -v dnf &>/dev/null; then
   sudo dnf install -y btop inxi unzip unrar git wget curl
 fi
