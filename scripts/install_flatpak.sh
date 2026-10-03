@@ -8,14 +8,19 @@
 ### Flatpak ###
 if command -v dnf &>/dev/null; then
   sudo dnf install -y flatpak
-  # Replace Fedora's own Flatpak repo with Flathub for better package
-  # management and app stability.
-  sudo systemctl disable flatpak-add-fedora-repos.service
-  flatpak remote-delete fedora --force || true
 fi
 
 if command -v yay &>/dev/null; then
   yay -S --noconfirm --needed flatpak
+fi
+
+# Fedora (traditional dnf installs AND Atomic/ostree images alike) ships
+# its own Flatpak remote by default — replace it with Flathub for better
+# package management and app stability. `command -v dnf` is false on
+# Atomic (no dnf on the host there), so check for ostree too.
+if command -v dnf &>/dev/null || [ -f /run/ostree-booted ]; then
+  sudo systemctl disable flatpak-add-fedora-repos.service 2>/dev/null || true
+  flatpak remote-delete fedora --force || true
 fi
 
 flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
