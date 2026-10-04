@@ -146,13 +146,34 @@ install_noctalia() {
 }
 
 ## Compositor overrides ##
-if [ "$MODE" = "hypr" ] || [ "$MODE" = "niri" ]; then
-  if [ "$MODE" = "niri" ]; then
-    echo "include optional=true \"niri_overrides.kdl\"" >>~/.config/niri/config.kdl
-  else
-    echo "require(\"hypr_overrides\")" >>~/.config/hypr/hyprland.lua
+# Runs after the compositor and shell are installed, so it appends to the
+# config they created instead of creating a stub file (which would stop the
+# compositor from writing its own default config on first launch).
+append_once() {
+  grep -qsF "$2" "$1" || echo "$2" >>"$1"
+}
+
+add_compositor_overrides() {
+  local config
+  case "$MODE" in
+  niri) config=~/.config/niri/config.kdl ;;
+  hypr) config=~/.config/hypr/hyprland.lua ;;
+  *) return 0 ;;
+  esac
+
+  if [ ! -f "$config" ]; then
+    echo "!!  $config doesn't exist yet; log in to $COMPOSITOR once, then add the override include by hand"
+    FAILED_STEPS="$FAILED_STEPS
+  - add_compositor_overrides: $config not found"
+    return 1
   fi
-fi
+
+  if [ "$MODE" = "niri" ]; then
+    append_once "$config" 'include optional=true "niri_overrides.kdl"'
+  else
+    append_once "$config" 'require("hypr_overrides")'
+  fi
+}
 
 install_gnome() {
   run_step ./install_gnome.sh
@@ -190,6 +211,8 @@ case "$SHELL_ARG" in
 dms) install_dank "$COMPOSITOR" ;;
 noctalia) install_noctalia ;;
 esac
+
+add_compositor_overrides
 
 ## Install pakcages I use ##
 if [[ "$SHELL_ARG" != "dms" ]]; then

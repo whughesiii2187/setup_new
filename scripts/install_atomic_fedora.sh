@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 #
-# Flatpak apps + dotfiles on Fedora Atomic (Silverblue, Kinoite, Cosmic
-# Atomic, etc.) — deliberately NOT the native rpm-ostree-layered extras
-# (RPM Fusion, codecs, printing, ufw, VPN, Docker). Nothing here calls
+# Personal Flatpak apps, Homebrew packages and dotfiles on top of the
+# darksaber image. The image already provides the desktop, codecs,
+# printing, ufw, virtualization, Flathub, Gear Lever, LibreOffice, Homebrew
+# and zsh, so none of that is repeated here. Nothing here calls
 # rpm-ostree, so no layer is created and no reboot is required.
-#
-# The desktop itself is already baked into whichever Atomic image you
-# booted — this script never installs a compositor or desktop.
 #
 # Usage: ./install_atomic_fedora.sh [niri|hypr] [dms|noctalia]
 #   Both args are optional and only affect which dotfiles overrides get
@@ -73,27 +71,23 @@ print_summary() {
 }
 trap print_summary EXIT
 
-## Flatpak + Flathub + folder access ##
-run_step ./install_flatpak.sh
-
-## Homebrew ##
-# Covers the CLI tools the traditional path gets from dnf/AUR instead.
-# Homebrew's `gcc` formula shells out to a system `cc` in its postinstall —
-# Fedora Atomic Desktop images ship gcc already (kernel-devel depends on
-# it), so this is expected to just work, but warn instead of hard-failing
-# install_brew.sh's `set -e` if some variant doesn't have it.
-if ! command -v cc &>/dev/null && ! command -v gcc &>/dev/null; then
-  echo "!!  No system compiler found; Homebrew's gcc formula may fail to postinstall" >&2
+## Homebrew packages ##
+# Flathub, Gear Lever, Homebrew itself and a system gcc all come with the
+# darksaber image, so only the packages are installed here. Homebrew is set
+# up by brew-setup.service on first boot.
+if [ -x /home/linuxbrew/.linuxbrew/bin/brew ]; then
+  eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+  run_step brew install stow tmux neovim lazygit claude-code font-0xproto-nerd-font gcc clipboard ripgrep tree-sitter-cli devcontainer
+else
+  echo "!!  Homebrew isn't set up yet (brew-setup.service runs on first boot); rerun this script later" >&2
+  FAILED_STEPS="$FAILED_STEPS
+  - brew install (Homebrew not set up yet)"
 fi
-run_step ./install_brew.sh
-
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-run_step brew install stow zsh tmux neovim
 
 ## zsh as the default shell ##
-ZSH_PATH="$(command -v zsh)"
-if [ -n "$ZSH_PATH" ]; then
-  grep -qxF "$ZSH_PATH" /etc/shells || echo "$ZSH_PATH" | sudo tee -a /etc/shells >/dev/null
+# Fedora's zsh from the image, so the login shell never depends on Homebrew.
+ZSH_PATH=/usr/bin/zsh
+if [ -x "$ZSH_PATH" ]; then
   sudo chsh -s "$ZSH_PATH" "$USER"
 
   OMZ_INSTALLER="$(mktemp)"
@@ -104,7 +98,7 @@ if [ -n "$ZSH_PATH" ]; then
   fi
   rm -f "$OMZ_INSTALLER"
 else
-  echo "!!  zsh not found on PATH, skipping shell change" >&2
+  echo "!!  $ZSH_PATH not found, skipping shell change" >&2
 fi
 
 ## tmux plugin manager ##
@@ -115,7 +109,6 @@ fi
 ## Flatpak apps I use ##
 run_step ./install_zen.sh
 run_step ./install_freetube.sh
-run_step ./install_office.sh
 run_step ./install_qbittorrent.sh
 run_step ./install_spotify.sh
 run_step ./install_tor.sh
@@ -124,9 +117,34 @@ run_step ./install_whatsapp.sh
 run_step ./install_bitwarden.sh
 
 ## Dotfiles ##
+# Make sure ~/.config/niri is a real directory first, otherwise stow links
+# the whole folder into ~/dotfiles and darksaber's config.kdl and DMS's
+# generated dms/*.kdl end up written into the repo.
+mkdir -p ~/.config/niri
+
 if [ -d "$HOME/dotfiles" ]; then
   echo "Dotfiles appear to be installed already, skipping"
 else
   rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/.local/share/nvim/
   run_step ./install_dotfiles.sh "$MODE" "$SHELL_ARG"
 fi
+
+## Niri overrides ##
+# darksaber's config.kdl includes local.kdl last, after DMS's dms/*.kdl,
+# so the overrides go there instead of into config.kdl (which darksaber
+# creates on first niri login).
+LOCAL_KDL=~/.config/niri/local.kdl
+for f in niri_overrides.kdl dank_overrides.kdl; do
+  grep -qsF "\"$f\"" "$LOCAL_KDL" || echo "include optional=true \"$f\"" >>"$LOCAL_KDL"
+done
+
+## Lid switch ##
+# laptop-display-niri.sh handles lid close/open itself (clamshell when
+# docked, lock when not), so logind must not suspend on its own.
+sudo mkdir -p /etc/systemd/logind.conf.d
+sudo tee /etc/systemd/logind.conf.d/no-lid-suspend.conf >/dev/null <<'EOF'
+[Login]
+HandleLidSwitch=ignore
+HandleLidSwitchDocked=ignore
+HandleLidSwitchExternalPower=ignore
+EOF
