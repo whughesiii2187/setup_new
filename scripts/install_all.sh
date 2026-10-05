@@ -53,7 +53,9 @@ run_step_tty() {
 flatpak_install() {
   local attempt
   for attempt in 1 2 3; do
-    if flatpak install -y "$@"; then
+    # --system: install_flatpak.sh adds Flathub as a system remote, and a
+    # user remote of the same name makes flatpak prompt for which one to use
+    if flatpak install --system -y "$@"; then
       return 0
     fi
     if [ "$attempt" -lt 3 ]; then
@@ -74,6 +76,8 @@ print_summary() {
   fi
 }
 trap print_summary EXIT
+trap 'FAILED_STEPS="$FAILED_STEPS
+  - interrupted"; exit 130' INT
 
 ## Devcontainer mode: minimal setup, nothing desktop-specific ##
 if [ "$1" = "devc" ]; then

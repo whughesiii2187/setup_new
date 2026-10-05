@@ -11,7 +11,7 @@
 #   sudo snap install bitwarden
 # fi
 
-flatpak_install flathub com.bitwarden.desktop
+flatpak_install flathub com.bitwarden.desktop || exit 1
 
 # Bitwarden's SSH agent creates a socket that the (sandboxed) app and
 # (unsandboxed) ssh/git both need to agree on the path to. Point both sides

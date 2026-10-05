@@ -49,7 +49,9 @@ run_step() {
 flatpak_install() {
   local attempt
   for attempt in 1 2 3; do
-    if flatpak install -y "$@"; then
+    # --system: darksaber ships Flathub as a system remote, and a user
+    # remote of the same name makes flatpak prompt for which one to use
+    if flatpak install --system -y "$@"; then
       return 0
     fi
     if [ "$attempt" -lt 3 ]; then
@@ -70,6 +72,8 @@ print_summary() {
   fi
 }
 trap print_summary EXIT
+trap 'FAILED_STEPS="$FAILED_STEPS
+  - interrupted"; exit 130' INT
 
 ## Homebrew packages ##
 # Flathub, Gear Lever, Homebrew itself and a system gcc all come with the

@@ -6,7 +6,9 @@ if command -v yay &>/dev/null; then
   yay -S --noconfirm --needed tor
 fi
 
-if command -v dnf &>/dev/null; then
+# dnf can't install onto an ostree/bootc system's read-only /usr; there,
+# tor has to come from the image instead.
+if command -v dnf &>/dev/null && [ ! -f /run/ostree-booted ]; then
   sudo dnf install -y tor
 fi
 
@@ -16,5 +18,5 @@ fi
 # fi
 
 sleep 5
-flatpak_install flathub org.torproject.torbrowser-launcher
+flatpak_install flathub org.torproject.torbrowser-launcher || exit 1
 echo -e "\033[32mFinished Tor browser install\033[0m"
