@@ -5,8 +5,9 @@
 # Every step checks what's already there first: on an image that ships
 # something (darksaber ships Flathub, Gear Lever, LibreOffice, Homebrew and
 # zsh), that step is skipped; on one that doesn't, it's installed here.
-# Nothing here calls rpm-ostree, so no layer is created and no reboot is
-# required.
+# The only packages layered with rpm-ostree are ones with no Flatpak or
+# Homebrew alternative (gcc for Homebrew, Ghostty), and only when the image
+# lacks them. They're applied live, so no reboot is required.
 #
 # Usage: ./install_atomic_fedora.sh [niri|hypr] [dms|noctalia]
 #   Both args are optional. They pick which dotfiles overrides get stowed
@@ -111,6 +112,36 @@ else
   run_step flatpak_install flathub it.mijorus.gearlever
 fi
 
+## Layered packages ##
+# gcc: Homebrew's gcc formula needs the system C toolchain (gcc and
+# glibc-devel) to finish installing. Ghostty: not on Flathub, and Homebrew
+# only packages it for macOS.
+LAYER_PACKAGES=()
+if ! command -v cc &>/dev/null && ! command -v gcc &>/dev/null; then
+  LAYER_PACKAGES+=(gcc)
+fi
+if ! command -v ghostty &>/dev/null; then
+  GHOSTTY_REPO=/etc/yum.repos.d/_copr:copr.fedorainfracloud.org:scottames:ghostty.repo
+  if [ ! -f "$GHOSTTY_REPO" ]; then
+    FEDORA=$(rpm -E %fedora)
+    sudo curl -fsSL -o "$GHOSTTY_REPO" \
+      "https://copr.fedorainfracloud.org/coprs/scottames/ghostty/repo/fedora-$FEDORA/scottames-ghostty-fedora-$FEDORA.repo" ||
+      fail_step "Couldn't add the Ghostty COPR repo"
+  fi
+  [ -f "$GHOSTTY_REPO" ] && LAYER_PACKAGES+=(ghostty)
+fi
+
+if [ "${#LAYER_PACKAGES[@]}" -eq 0 ]; then
+  echo "==> gcc and Ghostty already installed, skipping layering"
+else
+  run_step sudo rpm-ostree install --idempotent --apply-live --assumeyes "${LAYER_PACKAGES[@]}"
+  for pkg in "${LAYER_PACKAGES[@]}"; do
+    if ! command -v "$pkg" &>/dev/null; then
+      fail_step "$pkg is layered but not live yet; reboot, then rerun this script"
+    fi
+  done
+fi
+
 ## Homebrew ##
 BREW=/home/linuxbrew/.linuxbrew/bin/brew
 if [ ! -x "$BREW" ] && systemctl list-unit-files brew-setup.service &>/dev/null; then
@@ -132,6 +163,9 @@ BREW_PACKAGES=(stow tmux neovim fzf lazygit claude-code font-0xproto-nerd-font g
 if [ -x "$BREW" ]; then
   eval "$("$BREW" shellenv)"
   run_step brew install "${BREW_PACKAGES[@]}"
+  # `brew install` doesn't redo a postinstall that failed on an earlier
+  # run (e.g. gcc before the system toolchain was layered); this does
+  run_step brew postinstall gcc
 else
   fail_step "Homebrew not available; skipped: brew install ${BREW_PACKAGES[*]}"
 fi
