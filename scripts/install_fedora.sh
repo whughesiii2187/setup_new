@@ -6,15 +6,26 @@ sudo dnf upgrade -y
 
 # System Config
 # Optimize DNF package manager for faster downloads and efficient updates
-sudo cp "/etc/dnf/dnf.conf" "/etc/dnf/dnf.conf.bak"
+# Back up the original once, so reruns don't overwrite it with an edited copy
+[ -f /etc/dnf/dnf.conf.bak ] || sudo cp /etc/dnf/dnf.conf /etc/dnf/dnf.conf.bak
 sudo dnf -y install dnf-plugins-core
-echo "gpgcheck=True" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
-echo "installonly_limit=3" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
-echo "clean_requirements_on_remove=True" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
-echo "best=True" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
-echo "max_parallel_downloads=10" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
-echo "fastestmirror=True" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
-echo "defaultyes=True" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
+
+# Set key=value in dnf.conf, replacing an existing line instead of appending
+# a duplicate on every run
+set_dnf_opt() {
+  if grep -q "^$1=" /etc/dnf/dnf.conf; then
+    sudo sed -i "s/^$1=.*/$1=$2/" /etc/dnf/dnf.conf
+  else
+    echo "$1=$2" | sudo tee -a /etc/dnf/dnf.conf >/dev/null
+  fi
+}
+set_dnf_opt gpgcheck True
+set_dnf_opt installonly_limit 3
+set_dnf_opt clean_requirements_on_remove True
+set_dnf_opt best True
+set_dnf_opt max_parallel_downloads 10
+set_dnf_opt fastestmirror True
+set_dnf_opt defaultyes True
 
 ### RPM Fusion ###
 sudo dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm
@@ -31,10 +42,26 @@ sudo dnf swap -y 'ffmpeg-free' 'ffmpeg' --allowerasing                          
 sudo dnf update @multimedia --setopt="install_weak_deps=False" --exclude=PackageKit-gstreamer-plugin -y # Installs gstreamer components. Required if you use Gnome Videos and other dependent applications.
 sudo dnf group install -y sound-and-video                                                               # Installs useful Sound and Video complementary packages.
 
-### H/W Video Acceleration
-sudo dnf install -y ffmpeg-libs libva libva-utils
-sudo dnf swap -y libva-intel-media-driver intel-media-driver --allowerasing
-sudo dnf install -y libva-intel-driver
+### H/W Video Acceleration ###
+# Only install the drivers for the GPU(s) actually present
+sudo dnf install -y pciutils ffmpeg-libs libva libva-utils
+GPUS="$(lspci -nn | grep -Ei 'vga|3d|display')"
+
+if grep -qi intel <<<"$GPUS"; then
+  sudo dnf swap -y libva-intel-media-driver intel-media-driver --allowerasing
+  sudo dnf install -y libva-intel-driver
+fi
+
+if grep -Eq 'Advanced Micro Devices|AMD\/ATI' <<<"$GPUS"; then
+  sudo dnf swap -y mesa-va-drivers mesa-va-drivers-freeworld --allowerasing
+  sudo dnf swap -y mesa-vdpau-drivers mesa-vdpau-drivers-freeworld --allowerasing
+fi
+
+if grep -qi nvidia <<<"$GPUS"; then
+  # akmod builds the kernel module after install; with Secure Boot on, the
+  # module's signing key must be enrolled (mokutil) before it will load
+  sudo dnf install -y akmod-nvidia xorg-x11-drv-nvidia-cuda libva-nvidia-driver
+fi
 
 sudo dnf install -y openh264 gstreamer1-plugin-openh264 mozilla-openh264
 sudo dnf config-manager setopt fedora-cisco-openh264.enabled=1

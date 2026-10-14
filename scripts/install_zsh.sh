@@ -8,17 +8,24 @@ if command -v dnf &> /dev/null; then
   sudo dnf install -y zsh which
 fi
 
-OMZ_INSTALLER="$(mktemp)"
-if curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -o "$OMZ_INSTALLER"; then
-  bash "$OMZ_INSTALLER" "" --unattended
+# The oh-my-zsh installer exits non-zero if it's already installed
+if [ -d ~/.oh-my-zsh ]; then
+  echo "oh-my-zsh already installed, skipping"
 else
-  echo "!!  Failed to download oh-my-zsh installer" >&2
+  OMZ_INSTALLER="$(mktemp)"
+  if curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -o "$OMZ_INSTALLER"; then
+    bash "$OMZ_INSTALLER" "" --unattended
+  else
+    echo "!!  Failed to download oh-my-zsh installer" >&2
+  fi
+  rm -f "$OMZ_INSTALLER"
 fi
-rm -f "$OMZ_INSTALLER"
 
 ZSH_PATH="$(command -v zsh)"
-if [ -n "$ZSH_PATH" ]; then
-  sudo chsh -s "$ZSH_PATH" "$USER"
-else
+if [ -z "$ZSH_PATH" ]; then
   echo "!!  zsh not found on PATH, skipping shell change" >&2
+elif [ "$(getent passwd "$USER" | cut -d: -f7)" = "$ZSH_PATH" ]; then
+  echo "Login shell is already $ZSH_PATH, skipping"
+else
+  sudo chsh -s "$ZSH_PATH" "$USER"
 fi

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 if command -v yay &>/dev/null; then
-  sudo yay -S --no-confirm --needed neovim
+  yay -S --noconfirm --needed neovim
 fi
 
 if command -v dnf &>/dev/null; then

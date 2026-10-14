@@ -128,10 +128,22 @@ install_dank() {
   done
 
   ## Dank overrides ##
+  # append_once: reruns don't add the line again. Skip a missing config
+  # instead of creating a stub that stops the compositor writing its own.
+  local config line
   if [ "$compositor" = "niri" ]; then
-    echo "include optional=true \"dank_overrides.kdl\"" >>~/.config/niri/config.kdl
+    config=~/.config/niri/config.kdl
+    line='include optional=true "dank_overrides.kdl"'
   else
-    echo "require(\"dank_overrides\")" >>~/.config/hypr/hyprland.lua
+    config=~/.config/hypr/hyprland.lua
+    line='require("dank_overrides")'
+  fi
+  if [ -f "$config" ]; then
+    append_once "$config" "$line"
+  else
+    echo "!!  $config doesn't exist yet; log in to $compositor once, then add: $line"
+    FAILED_STEPS="$FAILED_STEPS
+  - install_dank: $config not found"
   fi
 }
 
@@ -164,6 +176,14 @@ add_compositor_overrides() {
   hypr) config=~/.config/hypr/hyprland.lua ;;
   *) return 0 ;;
   esac
+
+  # Niri only writes its default config on first login. Without a shell
+  # that generates one (DMS), seed it from the package's copy now, so the
+  # include below lands in a complete config rather than a stub.
+  local niri_default=/usr/share/doc/niri/default-config.kdl
+  if [ "$MODE" = "niri" ] && [ ! -f "$config" ] && [ -f "$niri_default" ]; then
+    install -Dm0644 "$niri_default" "$config"
+  fi
 
   if [ ! -f "$config" ]; then
     echo "!!  $config doesn't exist yet; log in to $COMPOSITOR once, then add the override include by hand"
@@ -243,6 +263,7 @@ run_step ./install_tor.sh
 run_step ./install_vlc.sh
 run_step ./install_snapper.sh
 run_step ./install_whatsapp.sh
+run_step ./install_apps.sh
 
 ## Clone and Stow Dotfiles ##
 if [ -d "$HOME/dotfiles" ]; then

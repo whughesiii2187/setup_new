@@ -64,13 +64,22 @@ mount -o subvol=var_lib_containers,compress=zstd:1 /dev/mapper/cryptroot /mnt/va
 mount -o subvol=var_lib_libvirt,compress=zstd:1    /dev/mapper/cryptroot /mnt/var/lib/libvirt/images
 
 ## Base install ##
+# The mkinitcpio "microcode" hook below needs the CPU's microcode package
+UCODE=""
+if grep -q GenuineIntel /proc/cpuinfo; then
+  UCODE=intel-ucode
+elif grep -q AuthenticAMD /proc/cpuinfo; then
+  UCODE=amd-ucode
+fi
+
 pacstrap -K /mnt base linux linux-firmware btrfs-progs grub efibootmgr \
-  networkmanager iwd curl git tar gzip inotify-tools sudo
+  networkmanager iwd curl git tar gzip inotify-tools sudo $UCODE
 
 genfstab -U /mnt >>/mnt/etc/fstab
 
 BTRFS_PART_UUID=$(blkid -s UUID -o value "$BTRFS_PART")
 
+read -rp "Hostname: " NEW_HOSTNAME
 read -rp "Username to create (added to the wheel group): " USERNAME
 
 arch-chroot /mnt /bin/bash <<CHROOT
@@ -82,6 +91,7 @@ hwclock --systohc
 sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 locale-gen
 echo "LANG=en_US.UTF-8" >/etc/locale.conf
+echo "$NEW_HOSTNAME" >/etc/hostname
 
 systemctl enable NetworkManager
 

@@ -12,6 +12,8 @@
 # Usage: ./install_atomic_fedora.sh [niri|hypr] [dms|noctalia]
 #   Both args are optional. They pick which dotfiles overrides get stowed
 #   (see install_dotfiles.sh) and whether the niri-specific steps run.
+#   When left out, they're detected from what's installed (darksaber has
+#   niri and dms, so it gets both).
 
 cd "$(dirname "$0")"
 
@@ -23,6 +25,12 @@ fi
 
 MODE="${1:-}"
 SHELL_ARG="${2:-}"
+if [ -z "$MODE" ] && command -v niri &>/dev/null; then
+  MODE=niri
+fi
+if [ -z "$SHELL_ARG" ] && command -v dms &>/dev/null; then
+  SHELL_ARG=dms
+fi
 
 LOG_DIR="$(cd .. && pwd)/logs"
 mkdir -p "$LOG_DIR"
@@ -86,7 +94,7 @@ trap 'FAILED_STEPS="$FAILED_STEPS
   - interrupted"; exit 130' INT
 
 USES_NIRI=false
-if [ "$MODE" = "niri" ] || command -v niri &>/dev/null; then
+if [ "$MODE" = "niri" ]; then
   USES_NIRI=true
 fi
 
@@ -159,7 +167,7 @@ else
   run_step ./install_brew.sh
 fi
 
-BREW_PACKAGES=(stow tmux neovim fzf lazygit claude-code font-0xproto-nerd-font gcc clipboard ripgrep tree-sitter-cli devcontainer)
+BREW_PACKAGES=(stow tmux neovim fzf lazygit claude-code font-0xproto-nerd-font gcc clipboard ripgrep tree-sitter-cli devcontainer hurl bat)
 if [ -x "$BREW" ]; then
   eval "$("$BREW" shellenv)"
   run_step brew install "${BREW_PACKAGES[@]}"
@@ -225,6 +233,14 @@ run_step ./install_tor.sh
 run_step ./install_vlc.sh
 run_step ./install_whatsapp.sh
 run_step ./install_bitwarden.sh
+run_step ./install_apps.sh
+
+# ProtonVPN: install_vpn.sh uses dnf, which can't install onto Atomic
+if flatpak info com.protonvpn.www &>/dev/null; then
+  echo "==> ProtonVPN already installed, skipping"
+else
+  run_step flatpak_install flathub com.protonvpn.www
+fi
 
 ## Dotfiles ##
 # Make sure ~/.config/niri is a real directory first, otherwise stow links
@@ -260,20 +276,27 @@ if [ "$USES_NIRI" = true ]; then
     fail_step "$NIRI_TARGET doesn't exist yet; log in to niri once, then rerun this script"
   else
     append_once "$NIRI_TARGET" 'include optional=true "niri_overrides.kdl"'
-    if [ "$SHELL_ARG" = "dms" ] || command -v dms &>/dev/null; then
+    if [ "$SHELL_ARG" = "dms" ]; then
       append_once "$NIRI_TARGET" 'include optional=true "dank_overrides.kdl"'
     fi
   fi
 
   ## Lid switch ##
-  # laptop-display-niri.sh handles lid close/open itself (clamshell when
-  # docked, lock when not), so logind must not suspend on its own. Only
-  # with niri: on GNOME/KDE variants this would stop lid-close suspend.
-  sudo mkdir -p /etc/systemd/logind.conf.d
-  sudo tee /etc/systemd/logind.conf.d/no-lid-suspend.conf >/dev/null <<'EOF'
+  # The dotfiles' laptop-display script handles lid close/open itself
+  # (clamshell when docked, lock when not), so logind must not suspend on
+  # its own. Only with niri (on GNOME/KDE variants this would stop
+  # lid-close suspend), and only when the script is actually there:
+  # otherwise closing the lid would do nothing at all.
+  if compgen -G "$HOME/.config/niri/scripts/laptop-display*.sh" >/dev/null; then
+    sudo mkdir -p /etc/systemd/logind.conf.d
+    sudo tee /etc/systemd/logind.conf.d/no-lid-suspend.conf >/dev/null <<'EOF'
 [Login]
 HandleLidSwitch=ignore
 HandleLidSwitchDocked=ignore
 HandleLidSwitchExternalPower=ignore
 EOF
+  else
+    sudo rm -f /etc/systemd/logind.conf.d/no-lid-suspend.conf
+    fail_step "No laptop-display script in ~/.config/niri/scripts; leaving logind's lid-close suspend on"
+  fi
 fi
