@@ -13,3 +13,9 @@ if ! command -v yay &>/dev/null; then
 fi
 
 yay -Syu --noconfirm
+
+# arch.install.sh lays down a bare base system with no sound server. Without
+# pipewire-pulse, apps that talk PulseAudio (Spotify, Zoom, most Flatpaks)
+# have no audio. wireplumber is named explicitly so --noconfirm doesn't have
+# to pick a pipewire-session-manager provider on its own.
+yay -S --noconfirm --needed pipewire pipewire-pulse wireplumber
