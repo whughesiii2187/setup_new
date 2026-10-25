@@ -109,10 +109,16 @@ install_dank() {
     rm -f "$DANK_BOOTSTRAP"
     return 1
   fi
-  run_step_tty bash "$DANK_BOOTSTRAP" -c "${compositor}" -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar
+  # Headless mode never prompts for a password: it needs sudo already cached.
+  # sudo caches per tty, and `script` in run_step_tty runs the installer on a
+  # new pty, so the `sudo -v` at the top of this file doesn't count there.
+  # Refresh it inside that same pty, right before the installer starts.
+  local dank_cmd=(bash -c 'sudo -v && exec bash "$@"' _ "$DANK_BOOTSTRAP"
+    -c "${compositor}" -t ghostty -y --dms-greeter --danksearch --dankcalendar)
+  run_step_tty "${dank_cmd[@]}"
   if [ "$status" -ne 0 ]; then
     echo "==> [$(date '+%H:%M:%S')] Dank install failed, retrying once..."
-    run_step_tty bash "$DANK_BOOTSTRAP" -c "${compositor}" -t ghostty -y --include-deps dms-greeter --danksearch --dankcalendar
+    run_step_tty "${dank_cmd[@]}"
   fi
   rm -f "$DANK_BOOTSTRAP"
   if [ "$status" -ne 0 ]; then
