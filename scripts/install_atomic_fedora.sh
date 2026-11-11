@@ -204,8 +204,8 @@ else
   run_step flatpak_install flathub org.libreoffice.LibreOffice
 fi
 
-run_step ./install_zen.sh
-run_step ./install_freetube.sh
+# run_step ./install_zen.sh
+# run_step ./install_freetube.sh
 run_step ./install_qbittorrent.sh
 run_step ./install_spotify.sh
 run_step ./install_tor.sh
@@ -214,12 +214,12 @@ run_step ./install_whatsapp.sh
 run_step ./install_bitwarden.sh
 run_step ./install_apps.sh
 
-# ProtonVPN: install_vpn.sh uses dnf, which can't install onto Atomic
-if flatpak info com.protonvpn.www &>/dev/null; then
-  echo "==> ProtonVPN already installed, skipping"
-else
-  run_step flatpak_install flathub com.protonvpn.www
-fi
+# # ProtonVPN: install_vpn.sh uses dnf, which can't install onto Atomic
+# if flatpak info com.protonvpn.www &>/dev/null; then
+#   echo "==> ProtonVPN already installed, skipping"
+# else
+#   run_step flatpak_install flathub com.protonvpn.www
+# fi
 
 ## Dotfiles ##
 # Also oh-my-zsh, TPM, Bitwarden's SSH agent, the Niri override includes
