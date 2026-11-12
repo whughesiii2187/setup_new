@@ -272,11 +272,6 @@ run_step ./install_whatsapp.sh
 run_step ./install_apps.sh
 
 ## Clone and Stow Dotfiles ##
-if [ -d "$HOME/dotfiles" ]; then
-  echo "Dotfiles appear to be installed already, skipping"
-else
-  # Directory cleanup so stow can symlink cleanly, even if ghostty/nvim/tmux
-  # were installed (and their default configs created) by steps above.
-  rm -rf ~/.config/ghostty/ ~/.config/nvim/ ~/.config/tmux ~/.local/state/nvim/ ~/.local/share/nvim/
-  run_step ./install_dotfiles.sh "$MODE" "$SHELL_ARG"
-fi
+# Also removes the default ghostty/nvim/tmux configs created by the steps
+# above, so stow can symlink cleanly
+run_step ./install_dotfiles.sh "$MODE" "$SHELL_ARG"
