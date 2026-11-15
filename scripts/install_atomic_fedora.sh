@@ -204,7 +204,7 @@ else
   run_step flatpak_install flathub org.libreoffice.LibreOffice
 fi
 
-# run_step ./install_zen.sh
+run_step ./install_zen.sh
 # run_step ./install_freetube.sh
 run_step ./install_qbittorrent.sh
 run_step ./install_spotify.sh
